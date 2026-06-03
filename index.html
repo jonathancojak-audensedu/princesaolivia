@@ -1,0 +1,1753 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>A Fazenda da Princesa Olívia</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap');
+:root {
+  --pink:#FF6B9D;--purple:#C084FC;--blue:#60A5FA;--yellow:#FDE68A;
+  --green:#86EFAC;--orange:#FCA5A5;--gold:#F59E0B;--dark:#1E1B4B;
+  --teal:#2DD4BF;--bg:#0a0520;--card:#ffffff12;--border:#ffffff22;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;overflow-x:hidden;user-select:none}
+
+#stars-bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.star{position:absolute;background:white;border-radius:50%;animation:twinkle linear infinite}
+@keyframes twinkle{0%,100%{opacity:.15;transform:scale(1)}50%{opacity:1;transform:scale(1.6)}}
+
+.screen{position:relative;z-index:1;min-height:100vh;display:none;flex-direction:column;align-items:center;justify-content:flex-start;padding:16px 16px 30px;overflow-y:auto}
+.screen.active{display:flex}
+
+/* LANG CORNER */
+.lang-corner{position:fixed;top:12px;left:12px;z-index:60;display:flex;gap:6px}
+.lang-corner-btn{background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.15);border-radius:12px;padding:4px 10px;color:white;font-family:'Fredoka One',cursive;font-size:.8rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:4px}
+.lang-corner-btn.active{border-color:var(--yellow);background:rgba(253,230,138,.15)}
+.lang-corner-btn:hover{border-color:var(--purple)}
+
+/* SETTINGS OVERLAY */
+.settings-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:16px}
+.settings-overlay.show{display:flex}
+.settings-box{background:linear-gradient(135deg,#2D1B69,#1a0a3a);border:4px solid var(--purple);border-radius:28px;padding:24px;width:100%;max-width:360px}
+.settings-title{font-family:'Fredoka One',cursive;color:var(--yellow);font-size:1.5rem;text-align:center;margin-bottom:16px}
+.settings-row{margin-bottom:14px}
+.settings-label{color:rgba(255,255,255,.7);font-weight:700;font-size:.9rem;margin-bottom:6px;display:block}
+.settings-input{width:100%;padding:10px 16px;border-radius:50px;border:3px solid var(--purple);background:rgba(255,255,255,.1);color:white;font-family:'Fredoka One',cursive;font-size:1.1rem;text-align:center;outline:none}
+.settings-input:focus{border-color:var(--yellow)}
+.speed-row{display:flex;gap:8px;align-items:center}
+.speed-btn{background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.2);border-radius:10px;padding:5px 12px;color:white;font-weight:700;font-size:.8rem;cursor:pointer;transition:all .2s}
+.speed-btn.active{background:var(--purple);border-color:var(--purple)}
+
+/* OLIVIA */
+.olivia-wrap{display:flex;flex-direction:column;align-items:center;position:relative}
+.olivia-svg{filter:drop-shadow(0 8px 24px rgba(192,132,252,.5));animation:float 3s ease-in-out infinite;transition:filter .3s}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.olivia-svg.happy{animation:happy .5s ease forwards!important}
+.olivia-svg.sad{animation:sad .5s ease forwards!important}
+@keyframes happy{0%{transform:scale(1)}30%{transform:scale(1.18)rotate(-6deg)}60%{transform:scale(1.18)rotate(6deg)}100%{transform:scale(1)}}
+@keyframes sad{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)rotate(-4deg)}75%{transform:translateX(10px)rotate(4deg)}}
+
+.speech-bubble{background:white;border-radius:20px;padding:10px 16px;color:var(--dark);font-weight:700;font-size:clamp(.8rem,2.5vw,.95rem);text-align:center;position:relative;max-width:300px;margin-bottom:8px;animation:bubbleIn .3s ease;line-height:1.4}
+.speech-bubble::after{content:'';position:absolute;bottom:-13px;left:50%;transform:translateX(-50%);border:13px solid transparent;border-top-color:white;border-bottom:0}
+@keyframes bubbleIn{0%{opacity:0;transform:scale(.8)translateY(-8px)}100%{opacity:1;transform:scale(1)translateY(0)}}
+
+/* WELCOME SCREEN */
+.title-main{font-family:'Fredoka One',cursive;font-size:clamp(1.8rem,6vw,3rem);color:var(--yellow);text-align:center;text-shadow:0 0 30px rgba(253,230,138,.5),3px 3px 0 rgba(0,0,0,.3);line-height:1.1}
+.title-sub{font-size:clamp(.9rem,2.5vw,1.1rem);color:var(--purple);text-align:center;font-weight:800;margin-top:4px}
+
+/* NARRATIVE BOX */
+.narrative-box{background:linear-gradient(135deg,rgba(192,132,252,.15),rgba(96,165,250,.15));border:2px solid rgba(192,132,252,.3);border-radius:20px;padding:14px 18px;max-width:340px;text-align:center;margin:8px 0}
+.narrative-text{color:rgba(255,255,255,.9);font-weight:700;font-size:clamp(.82rem,2.3vw,.95rem);line-height:1.5}
+.narrative-emoji{font-size:1.4rem;margin-bottom:4px;display:block}
+
+/* SOCIAL PROOF */
+.social-proof{display:flex;align-items:center;gap:6px;background:rgba(134,239,172,.1);border:2px solid rgba(134,239,172,.25);border-radius:50px;padding:6px 14px;margin:4px 0}
+.social-proof-text{color:var(--green);font-weight:800;font-size:.82rem}
+
+.btn-primary{background:linear-gradient(135deg,var(--pink),var(--purple));border:none;border-radius:50px;padding:14px 36px;color:white;font-family:'Fredoka One',cursive;font-size:1.3rem;cursor:pointer;box-shadow:0 6px 20px rgba(255,107,157,.4);transition:all .2s;letter-spacing:.3px}
+.btn-primary:hover{transform:scale(1.05)translateY(-2px);box-shadow:0 10px 28px rgba(255,107,157,.6)}
+.btn-primary:active{transform:scale(.97)}
+.btn-secondary{background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.25);border-radius:50px;padding:9px 22px;color:white;font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-secondary:hover{background:rgba(255,255,255,.22)}
+
+/* TOP BAR */
+.top-bar{position:fixed;top:12px;right:12px;display:flex;gap:8px;z-index:50}
+.icon-btn{background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.2);border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;transition:all .2s}
+.icon-btn:hover{background:rgba(255,255,255,.25);transform:scale(1.1)}
+
+/* PLAYER HEADER */
+.player-header{width:100%;max-width:600px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.player-name-tag{font-family:'Fredoka One',cursive;color:var(--yellow);font-size:1.1rem}
+.score-tag{background:rgba(253,230,138,.15);border:2px solid var(--gold);border-radius:16px;padding:4px 12px;color:var(--yellow);font-weight:800;font-size:.9rem}
+
+/* XP BAR */
+.xp-section{width:100%;max-width:500px;margin-bottom:14px}
+.xp-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.xp-level{font-family:'Fredoka One',cursive;color:var(--purple);font-size:1rem}
+.xp-next{color:rgba(255,255,255,.5);font-size:.8rem;font-weight:700}
+.xp-next-preview{color:var(--gold);font-size:.75rem;font-weight:800;display:flex;align-items:center;gap:3px}
+.xp-bar{height:14px;background:rgba(255,255,255,.1);border-radius:10px;overflow:hidden;position:relative;cursor:pointer}
+.xp-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--pink));border-radius:10px;transition:width .8s cubic-bezier(.34,1.56,.64,1)}
+.xp-milestone{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:.65rem;color:rgba(255,255,255,.7);font-weight:800;white-space:nowrap}
+
+/* FARM SCENE */
+.farm-scene{width:100%;max-width:500px;background:linear-gradient(180deg,#1a3a1a 0%,#2d5a2d 60%,#8B6914 100%);border-radius:24px;border:3px solid rgba(255,255,255,.15);padding:16px;margin-bottom:16px;position:relative;overflow:hidden;min-height:120px}
+.farm-sky{position:absolute;top:0;left:0;right:0;height:50%;background:linear-gradient(180deg,#0a1628 0%,#1a3a1a 100%)}
+.farm-elements{display:flex;align-items:flex-end;gap:8px;position:relative;z-index:1;min-height:90px;flex-wrap:wrap}
+.farm-item{font-size:clamp(1.5rem,4vw,2rem);animation:float 3s ease-in-out infinite;transition:all .5s}
+.farm-item:nth-child(2){animation-delay:.5s}
+.farm-item:nth-child(3){animation-delay:1s}
+.farm-item:nth-child(4){animation-delay:1.5s}
+.farm-label{position:absolute;top:8px;right:12px;color:rgba(255,255,255,.7);font-size:.75rem;font-weight:700}
+
+/* CLOSET */
+.closet-btn{background:linear-gradient(135deg,rgba(192,132,252,.3),rgba(96,165,250,.3));border:2px solid var(--purple);border-radius:16px;padding:10px 18px;color:white;cursor:pointer;display:flex;align-items:center;gap:8px;font-weight:700;font-size:.9rem;transition:all .25px;margin-bottom:12px}
+.closet-btn:hover{transform:scale(1.04);border-color:var(--yellow)}
+.closet-count{background:var(--pink);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:900}
+
+/* PHASE CARDS */
+.phases-grid{display:flex;flex-direction:column;gap:12px;width:100%;max-width:420px}
+.phase-card{background:var(--card);border:3px solid var(--border);border-radius:22px;padding:14px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .3s;position:relative;overflow:hidden}
+.phase-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--c1,#FF6B9D),var(--c2,#C084FC));opacity:0;transition:opacity .3s;border-radius:19px}
+.phase-card.unlocked:hover::before{opacity:.2}
+.phase-card.unlocked{border-color:rgba(255,255,255,.35);cursor:pointer}
+.phase-card.locked{opacity:.55;cursor:not-allowed}
+.phase-card.completed{border-color:var(--gold)}
+.phase-emoji{font-size:2.2rem;position:relative;z-index:1;flex-shrink:0}
+.phase-info{flex:1;position:relative;z-index:1}
+.phase-name{font-family:'Fredoka One',cursive;color:white;font-size:1.1rem}
+.phase-desc{color:rgba(255,255,255,.65);font-size:.82rem;font-weight:600}
+.phase-teaser{color:var(--teal);font-size:.75rem;font-weight:700;margin-top:2px;font-style:italic}
+.phase-right{position:relative;z-index:1;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.phase-stars{font-size:1rem}
+.phase-missions{font-size:.7rem;color:var(--teal);font-weight:700}
+
+/* MISSION PREVIEW */
+.mission-preview-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:16px}
+.mission-preview-overlay.show{display:flex}
+.mission-preview-box{background:linear-gradient(135deg,#2D1B69,#1a0a3a);border:4px solid var(--teal);border-radius:28px;padding:24px;width:100%;max-width:380px;animation:chestPop .4s cubic-bezier(.34,1.56,.64,1)}
+.mission-preview-title{font-family:'Fredoka One',cursive;color:var(--yellow);font-size:1.4rem;text-align:center;margin-bottom:4px}
+.mission-preview-phase{color:rgba(255,255,255,.6);font-size:.85rem;text-align:center;font-weight:700;margin-bottom:14px}
+.mission-preview-list{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.mp-item{background:rgba(255,255,255,.07);border:2px solid rgba(45,212,191,.3);border-radius:14px;padding:10px 14px;display:flex;align-items:center;gap:10px}
+.mp-icon{font-size:1.2rem}
+.mp-text{color:white;font-weight:700;font-size:.9rem;flex:1}
+.mp-reward{color:var(--teal);font-size:.78rem;font-weight:800}
+
+/* GAME SCREEN */
+.game-header{width:100%;max-width:580px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px}
+.phase-title-game{font-family:'Fredoka One',cursive;color:var(--yellow);font-size:1.2rem}
+.game-stats{display:flex;gap:8px;align-items:center}
+.combo-badge{background:linear-gradient(135deg,var(--gold),var(--orange));border-radius:16px;padding:4px 12px;font-family:'Fredoka One',cursive;font-size:1rem;color:white;display:none;animation:comboPop .3s ease}
+.combo-badge.show{display:block}
+@keyframes comboPop{0%{transform:scale(0)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+.timer-box{background:rgba(255,255,255,.1);border:2px solid var(--purple);border-radius:18px;padding:5px 14px;color:white;font-family:'Fredoka One',cursive;font-size:1.2rem;min-width:54px;text-align:center;transition:all .3s}
+.timer-box.urgent{border-color:var(--pink);color:var(--pink);animation:pulseTmr .5s infinite}
+@keyframes pulseTmr{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+
+.progress-bar{width:100%;max-width:580px;height:10px;background:rgba(255,255,255,.1);border-radius:8px;margin-bottom:12px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--pink),var(--purple));border-radius:8px;transition:width .5s ease}
+
+/* MISSION STRIP */
+.mission-strip{width:100%;max-width:580px;background:rgba(45,212,191,.1);border:2px solid rgba(45,212,191,.3);border-radius:14px;padding:8px 14px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.mission-icon{font-size:1.1rem}
+.mission-text{color:var(--teal);font-weight:700;font-size:.85rem;flex:1}
+.mission-prog{color:white;font-weight:800;font-size:.85rem}
+.mission-complete-flash{animation:missionFlash .6s ease}
+@keyframes missionFlash{0%{background:rgba(134,239,172,.4)}100%{background:rgba(45,212,191,.1)}}
+
+/* QUESTION */
+.question-box{background:var(--card);border:3px solid var(--purple);border-radius:22px;padding:14px 22px;margin-bottom:14px;text-align:center;width:100%;max-width:440px;position:relative}
+.question-label{color:rgba(255,255,255,.65);font-size:.82rem;font-weight:700;margin-bottom:4px;display:block}
+.word-foreign{font-family:'Fredoka One',cursive;font-size:clamp(1.6rem,6vw,2.6rem);color:var(--yellow);display:block;text-shadow:0 0 18px rgba(253,230,138,.4)}
+.word-native{font-size:clamp(.82rem,2.5vw,1rem);color:rgba(255,255,255,.65);font-weight:600;margin-top:3px;display:block}
+.speak-btn{position:absolute;top:10px;right:12px;background:none;border:none;font-size:1.4rem;cursor:pointer;transition:transform .2s}
+.speak-btn:hover{transform:scale(1.2)}
+
+/* OPTIONS */
+.options-grid{display:grid;gap:12px;width:100%;max-width:450px}
+.options-grid.opts-2{grid-template-columns:repeat(2,1fr)}
+.options-grid.opts-3{grid-template-columns:repeat(3,1fr)}
+.options-grid.opts-4{grid-template-columns:repeat(2,1fr)}
+.opt-card{background:var(--card);border:4px solid var(--border);border-radius:22px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.opt-card:hover:not(.disabled){border-color:var(--purple);background:rgba(192,132,252,.15);transform:scale(1.04)}
+.opt-emoji{font-size:clamp(2.2rem,7vw,3rem)}
+.opt-word{font-family:'Fredoka One',cursive;color:white;font-size:clamp(.85rem,2.3vw,1.1rem);text-align:center;line-height:1.2}
+.opt-card.correct{border-color:var(--green);background:rgba(134,239,172,.22);animation:correctPulse .5s ease}
+.opt-card.wrong{border-color:var(--orange);background:rgba(252,165,165,.18);animation:wrongShake .4s ease}
+.opt-card.disabled{pointer-events:none}
+@keyframes correctPulse{0%{transform:scale(1)}50%{transform:scale(1.09)}100%{transform:scale(1)}}
+@keyframes wrongShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+
+/* FEEDBACK */
+.feedback-overlay{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;pointer-events:none;opacity:0;transition:opacity .25s;background:rgba(0,0,0,.3)}
+.feedback-overlay.show{opacity:1}
+.feedback-text{font-family:'Fredoka One',cursive;font-size:clamp(2.2rem,9vw,4.5rem);text-align:center;animation:feedPop .5s ease}
+@keyframes feedPop{0%{transform:scale(0);opacity:0}60%{transform:scale(1.2);opacity:1}100%{transform:scale(1)}}
+.feedback-correct{color:var(--green);text-shadow:0 0 36px rgba(134,239,172,.8)}
+.feedback-wrong{color:var(--orange);text-shadow:0 0 36px rgba(252,165,165,.8)}
+
+/* CONFETTI */
+.confetti-piece{position:fixed;width:12px;height:12px;pointer-events:none;z-index:200;border-radius:2px;animation:confettiFall linear forwards}
+@keyframes confettiFall{0%{transform:translateY(-20px)rotate(0deg);opacity:1}100%{transform:translateY(110vh)rotate(720deg);opacity:0}}
+
+/* SCORE POPUP */
+.score-popup{position:fixed;font-family:'Fredoka One',cursive;font-size:1.7rem;color:var(--yellow);text-shadow:0 0 18px rgba(253,230,138,.8);pointer-events:none;z-index:150;animation:scoreFloat 1.2s ease forwards}
+@keyframes scoreFloat{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-70px)}}
+
+/* COMBO EXPLOSION */
+.combo-explosion{position:fixed;inset:0;pointer-events:none;z-index:110;display:flex;align-items:center;justify-content:center;opacity:0}
+.combo-explosion.show{animation:comboExplode .8s ease forwards}
+@keyframes comboExplode{0%{opacity:0;transform:scale(.5)}30%{opacity:1;transform:scale(1.1)}70%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.2)}}
+.combo-text{font-family:'Fredoka One',cursive;font-size:clamp(3rem,10vw,6rem);color:var(--gold);text-shadow:0 0 40px rgba(245,158,11,.8),0 4px 0 rgba(0,0,0,.3)}
+
+/* MISSION COMPLETE POPUP */
+.mission-complete-popup{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,rgba(45,212,191,.9),rgba(134,239,172,.9));border:3px solid var(--green);border-radius:50px;padding:10px 22px;z-index:160;pointer-events:none;display:flex;align-items:center;gap:8px;opacity:0}
+.mission-complete-popup.show{animation:missionPopup 2.5s ease forwards}
+@keyframes missionPopup{0%{opacity:0;transform:translateX(-50%)translateY(-20px)}15%{opacity:1;transform:translateX(-50%)translateY(0)}80%{opacity:1;transform:translateX(-50%)translateY(0)}100%{opacity:0;transform:translateX(-50%)translateY(-20px)}}
+.mcp-text{font-family:'Fredoka One',cursive;color:#0a2a1a;font-size:1rem}
+
+/* CHEST */
+.chest-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+.chest-overlay.show{display:flex}
+.chest-box{background:linear-gradient(135deg,#2D1B69,#1a0a3a);border:4px solid var(--gold);border-radius:28px;padding:30px;text-align:center;animation:chestPop .5s cubic-bezier(.34,1.56,.64,1)}
+@keyframes chestPop{0%{transform:scale(0)rotate(-10deg)}100%{transform:scale(1)rotate(0)}}
+.chest-emoji{font-size:4rem;animation:chestBounce .6s ease infinite alternate}
+@keyframes chestBounce{0%{transform:scale(1)}100%{transform:scale(1.15)rotate(5deg)}}
+.chest-title{font-family:'Fredoka One',cursive;color:var(--gold);font-size:1.8rem;margin:8px 0}
+.chest-item{font-size:3rem;margin:8px 0;animation:itemReveal .8s cubic-bezier(.34,1.56,.64,1) .3s both}
+@keyframes itemReveal{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
+.chest-item-name{font-family:'Fredoka One',cursive;color:var(--purple);font-size:1.2rem}
+
+/* CLOSET OVERLAY */
+.closet-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:16px}
+.closet-overlay.show{display:flex}
+.closet-box{background:linear-gradient(135deg,#2D1B69,#1a0a3a);border:4px solid var(--purple);border-radius:28px;padding:24px;width:100%;max-width:420px;max-height:80vh;overflow-y:auto}
+.closet-title{font-family:'Fredoka One',cursive;color:var(--yellow);font-size:1.6rem;text-align:center;margin-bottom:16px}
+.closet-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.closet-item{background:rgba(255,255,255,.08);border:3px solid rgba(255,255,255,.15);border-radius:16px;padding:10px;text-align:center;transition:all .25s;cursor:default}
+.closet-item.owned{border-color:var(--gold);background:rgba(245,158,11,.15);cursor:pointer}
+.closet-item.owned:hover{transform:scale(1.08)}
+.closet-item.equipped{border-color:var(--green);background:rgba(134,239,172,.2)}
+.closet-item .ci-emoji{font-size:1.8rem}
+.closet-item .ci-name{font-size:.65rem;color:rgba(255,255,255,.7);font-weight:700;margin-top:4px}
+.closet-item .ci-lock{font-size:1rem;opacity:.4}
+.closet-level-badge{background:var(--purple);border-radius:8px;padding:2px 6px;font-size:.6rem;color:white;font-weight:900;margin-top:2px;display:inline-block}
+
+/* RESULT */
+.result-stars{font-size:clamp(2.2rem,7vw,3.5rem);margin:12px 0;animation:starsPop .8s ease}
+@keyframes starsPop{0%{transform:scale(0)rotate(-20deg);opacity:0}70%{transform:scale(1.2)rotate(5deg);opacity:1}100%{transform:scale(1)rotate(0)}}
+.result-title{font-family:'Fredoka One',cursive;font-size:clamp(1.6rem,5vw,2.5rem);color:var(--yellow);text-align:center}
+.result-score{color:var(--purple);font-weight:800;font-size:1.1rem;margin:6px 0 12px}
+.result-missions{width:100%;max-width:380px;background:var(--card);border:2px solid var(--border);border-radius:18px;padding:12px;margin-bottom:14px}
+.mission-result-item{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:.9rem;font-weight:700}
+.mission-result-item.done{color:var(--green)}
+.mission-result-item.fail{color:rgba(255,255,255,.4)}
+.result-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+
+/* SESSION END */
+.session-end-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:16px}
+.session-end-overlay.show{display:flex}
+.session-end-box{background:linear-gradient(135deg,#1E1B4B,#0a0520);border:4px solid var(--purple);border-radius:28px;padding:28px;width:100%;max-width:360px;text-align:center}
+.session-end-olivia{font-size:3.5rem;animation:float 3s ease-in-out infinite}
+.session-end-title{font-family:'Fredoka One',cursive;color:var(--yellow);font-size:1.5rem;margin:8px 0}
+.session-end-msg{color:rgba(255,255,255,.8);font-weight:700;font-size:.95rem;line-height:1.5;margin-bottom:8px}
+.session-end-teaser{background:rgba(192,132,252,.2);border:2px solid rgba(192,132,252,.4);border-radius:14px;padding:10px 14px;color:var(--purple);font-weight:800;font-size:.9rem;margin:10px 0}
+
+/* RANKING */
+.ranking-list{width:100%;max-width:400px;display:flex;flex-direction:column;gap:10px;margin:14px 0}
+.ranking-item{background:var(--card);border:2px solid var(--border);border-radius:16px;padding:11px 16px;display:flex;align-items:center;gap:10px}
+.rank-pos{font-family:'Fredoka One',cursive;font-size:1.4rem;min-width:34px;text-align:center}
+.rank-name{flex:1;font-weight:700;color:white;font-size:1rem}
+.rank-score{color:var(--yellow);font-weight:800;font-size:.9rem}
+.rank-level{color:var(--purple);font-size:.8rem;font-weight:700}
+
+/* LEVEL UP */
+.levelup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:250;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+.levelup-overlay.show{display:flex;animation:lvlFade .3s ease}
+@keyframes lvlFade{0%{opacity:0}100%{opacity:1}}
+.levelup-box{background:linear-gradient(135deg,#1E1B4B,#0a0520);border:5px solid var(--gold);border-radius:32px;padding:32px 40px;text-align:center;animation:lvlPop .6s cubic-bezier(.34,1.56,.64,1)}
+@keyframes lvlPop{0%{transform:scale(0)rotate(-8deg)}100%{transform:scale(1)rotate(0)}}
+.levelup-title{font-family:'Fredoka One',cursive;font-size:2.5rem;color:var(--gold);text-shadow:0 0 30px rgba(245,158,11,.6)}
+.levelup-num{font-family:'Fredoka One',cursive;font-size:5rem;color:white;line-height:1}
+.levelup-item{font-size:3.5rem;animation:itemReveal .8s cubic-bezier(.34,1.56,.64,1) .4s both}
+.levelup-item-name{font-family:'Fredoka One',cursive;color:var(--purple);font-size:1.2rem}
+
+@media(max-width:480px){.options-grid{gap:9px}.opt-card{padding:11px 7px}}
+</style>
+</head>
+<body>
+<div id="stars-bg"></div>
+
+<!-- LANG CORNER -->
+<div class="lang-corner" id="lang-corner">
+  <button class="lang-corner-btn active" onclick="setLang('pt')" id="lang-pt">🇧🇷</button>
+  <button class="lang-corner-btn" onclick="setLang('en')" id="lang-en">🇺🇸</button>
+  <button class="lang-corner-btn" onclick="setLang('fr')" id="lang-fr">🇫🇷</button>
+</div>
+
+<!-- OVERLAYS -->
+<div class="feedback-overlay" id="feedback-overlay">
+  <div class="feedback-text" id="feedback-text"></div>
+</div>
+<div class="combo-explosion" id="combo-explosion">
+  <div class="combo-text" id="combo-text"></div>
+</div>
+<div class="mission-complete-popup" id="mission-complete-popup">
+  <span>✅</span><span class="mcp-text" id="mcp-text">Missão completa!</span>
+</div>
+
+<div class="chest-overlay" id="chest-overlay">
+  <div class="chest-box">
+    <div class="chest-emoji">🎁</div>
+    <div class="chest-title" id="chest-title">Baú do Tesouro!</div>
+    <div class="chest-item" id="chest-item-emoji"></div>
+    <div class="chest-item-name" id="chest-item-name"></div>
+  </div>
+  <button class="btn-primary" onclick="closeChest()">Oba! ✨</button>
+</div>
+
+<div class="levelup-overlay" id="levelup-overlay">
+  <div class="levelup-box">
+    <div class="levelup-title" id="levelup-title">LEVEL UP!</div>
+    <div class="levelup-num" id="levelup-num"></div>
+    <div style="color:rgba(255,255,255,.6);font-size:.9rem;font-weight:700;margin:8px 0">Item desbloqueado:</div>
+    <div class="levelup-item" id="levelup-item-emoji"></div>
+    <div class="levelup-item-name" id="levelup-item-name"></div>
+  </div>
+  <button class="btn-primary" onclick="closeLevelUp()">Incrível! 🌟</button>
+</div>
+
+<div class="closet-overlay" id="closet-overlay">
+  <div class="closet-box">
+    <div class="closet-title">👗 Closet da Olívia</div>
+    <div class="closet-grid" id="closet-grid"></div>
+  </div>
+  <button class="btn-secondary" onclick="closeCloset()">Fechar</button>
+</div>
+
+<!-- MISSION PREVIEW -->
+<div class="mission-preview-overlay" id="mission-preview-overlay">
+  <div class="mission-preview-box">
+    <div class="mission-preview-title">🎯 Missões da Fase</div>
+    <div class="mission-preview-phase" id="mp-phase-name"></div>
+    <div class="mission-preview-list" id="mp-list"></div>
+  </div>
+  <button class="btn-primary" id="mp-start-btn" onclick="confirmStartPhase()">Vamos lá! 🌟</button>
+  <button class="btn-secondary" onclick="closeMissionPreview()">Voltar</button>
+</div>
+
+<!-- SESSION END -->
+<div class="session-end-overlay" id="session-end-overlay">
+  <div class="session-end-box">
+    <div class="session-end-olivia">👸</div>
+    <div class="session-end-title" id="se-title">Até logo! ✨</div>
+    <div class="session-end-msg" id="se-msg"></div>
+    <div class="session-end-teaser" id="se-teaser"></div>
+  </div>
+  <button class="btn-primary" onclick="closeSessionEnd()">Continuar Jogando 🌟</button>
+  <button class="btn-secondary" onclick="reallyExit()">Sair por hoje 👋</button>
+</div>
+
+<!-- SETTINGS -->
+<div class="settings-overlay" id="settings-overlay">
+  <div class="settings-box">
+    <div class="settings-title">⚙️ Configurações</div>
+    <div class="settings-row">
+      <span class="settings-label" id="sl-name">Seu nome:</span>
+      <input class="settings-input" id="settings-name-input" type="text" maxlength="20">
+    </div>
+    <div class="settings-row">
+      <span class="settings-label">Velocidade da voz:</span>
+      <div class="speed-row">
+        <button class="speed-btn active" onclick="setSpeed(1.0,this)">1.0x</button>
+        <button class="speed-btn" onclick="setSpeed(1.25,this)">1.25x</button>
+        <button class="speed-btn" onclick="setSpeed(1.5,this)">1.5x</button>
+      </div>
+    </div>
+  </div>
+  <button class="btn-primary" onclick="saveSettings()">Salvar ✨</button>
+  <button class="btn-secondary" onclick="closeSettings()">Fechar</button>
+</div>
+
+<!-- TOP BAR -->
+<div class="top-bar" id="top-bar" style="display:none">
+  <div class="icon-btn" onclick="openCloset()" title="Closet">👗</div>
+  <div class="icon-btn" onclick="showRanking()" title="Ranking">🏆</div>
+  <div class="icon-btn" onclick="openSettings()" title="Configurações">⚙️</div>
+  <div class="icon-btn" onclick="tryExit()" title="Sair">🏠</div>
+</div>
+
+<!-- ==================== WELCOME ==================== -->
+<div class="screen active" id="screen-welcome" style="justify-content:center;gap:10px;padding-top:50px">
+  <div class="olivia-wrap">
+    <div class="speech-bubble" id="welcome-bubble">Olá! Eu sou a Princesa Olívia! 🌟</div>
+    <svg class="olivia-svg" id="olivia-main" width="150" height="238" viewBox="0 0 200 320" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="100" cy="110" rx="68" ry="80" fill="#E8D5A3"/>
+      <path d="M 38 110 Q 20 185 30 265 Q 50 280 60 240 Q 55 180 60 130 Z" fill="#D4B896"/>
+      <path d="M 162 110 Q 180 185 170 265 Q 150 280 140 240 Q 145 180 140 130 Z" fill="#D4B896"/>
+      <path d="M 50 80 Q 60 50 100 45 Q 140 50 150 80 Q 130 65 100 62 Q 70 65 50 80 Z" fill="#C9A87C"/>
+      <rect x="62" y="42" width="76" height="22" rx="6" fill="#F59E0B" id="crown-base"/>
+      <polygon points="65,42 72,22 79,42" fill="#F59E0B"/>
+      <polygon points="85,42 95,18 105,42" fill="#F59E0B"/>
+      <polygon points="105,42 115,18 125,42" fill="#F59E0B"/>
+      <polygon points="121,42 128,22 135,42" fill="#F59E0B"/>
+      <circle cx="100" cy="30" r="6" fill="#EC4899"/>
+      <circle cx="80" cy="34" r="4" fill="#60A5FA"/>
+      <circle cx="120" cy="34" r="4" fill="#60A5FA"/>
+      <ellipse cx="100" cy="115" rx="52" ry="55" fill="#FFD9B5"/>
+      <ellipse cx="68" cy="128" rx="14" ry="10" fill="#FFB3C6" opacity="0.5"/>
+      <ellipse cx="132" cy="128" rx="14" ry="10" fill="#FFB3C6" opacity="0.5"/>
+      <ellipse cx="82" cy="108" rx="12" ry="13" fill="#1E40AF"/>
+      <ellipse cx="118" cy="108" rx="12" ry="13" fill="#1E40AF"/>
+      <ellipse cx="82" cy="108" rx="8" ry="9" fill="#1E3A8A"/>
+      <ellipse cx="118" cy="108" rx="8" ry="9" fill="#1E3A8A"/>
+      <circle cx="84" cy="104" r="3" fill="white"/>
+      <circle cx="120" cy="104" r="3" fill="white"/>
+      <path d="M72 98 Q70 93 68 91" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M78 95 Q78 89 78 87" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M85 94 Q87 89 89 87" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M128 98 Q130 93 132 91" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M122 95 Q122 89 122 87" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M115 94 Q113 89 111 87" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <ellipse cx="100" cy="123" rx="5" ry="3" fill="#F5B9A0"/>
+      <path d="M83 138 Q100 152 117 138" stroke="#E07B6A" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M88 141 Q100 150 112 141 Q112 147 100 148 Q88 147 88 141 Z" fill="white"/>
+      <path id="olivia-dress" d="M48 170 Q45 200 40 260 Q60 270 100 272 Q140 270 160 260 Q155 200 152 170 Q130 185 100 185 Q70 185 48 170 Z" fill="#60A5FA"/>
+      <path d="M55 155 Q100 175 145 155 Q140 145 135 140 L130 165 Q100 178 70 165 L65 140 Q60 145 55 155 Z" fill="#3B82F6"/>
+      <path d="M40 260 Q60 280 100 282 Q140 280 160 260 L152 240 Q130 255 100 257 Q70 255 48 240 Z" fill="#2563EB"/>
+      <g id="dress-stars">
+        <text x="80" y="220" font-size="16" fill="white" opacity="0.6">✦</text>
+        <text x="105" y="240" font-size="12" fill="white" opacity="0.5">✦</text>
+        <text x="68" y="248" font-size="10" fill="white" opacity="0.4">✦</text>
+        <text x="118" y="215" font-size="14" fill="white" opacity="0.5">✦</text>
+      </g>
+      <rect x="88" y="162" width="24" height="18" rx="8" fill="#FFD9B5"/>
+      <path d="M55 165 Q30 180 25 210 Q30 220 40 215 Q42 195 55 180 Z" fill="#FFD9B5"/>
+      <path d="M145 165 Q170 180 175 210 Q170 220 160 215 Q158 195 145 180 Z" fill="#FFD9B5"/>
+      <ellipse cx="27" cy="218" rx="12" ry="10" fill="#FFD9B5"/>
+      <ellipse cx="173" cy="218" rx="12" ry="10" fill="#FFD9B5"/>
+      <line x1="173" y1="218" x2="190" y2="175" stroke="#F59E0B" stroke-width="4" stroke-linecap="round"/>
+      <polygon points="190,168 185,178 195,178" fill="#F59E0B"/>
+      <circle cx="190" cy="168" r="8" fill="#EC4899" id="olivia-wand-star"/>
+      <text x="194" y="162" font-size="10" fill="#FDE68A">✦</text>
+      <g id="acc-layer"></g>
+      <g id="necklace-layer"></g>
+      <g id="wings-layer"></g>
+    </svg>
+  </div>
+
+  <h1 class="title-main">Fazenda da<br>Princesa Olívia</h1>
+
+  <div class="narrative-box">
+    <span class="narrative-emoji">🌟</span>
+    <p class="narrative-text" id="narrative-text">A Princesa Olívia está construindo a fazenda mais mágica do reino! Cada resposta certa faz a fazenda crescer e ganhar um novo morador!</p>
+  </div>
+
+  <div class="social-proof">
+    <span>🌟</span>
+    <span class="social-proof-text" id="social-proof-text">4.231 crianças estão jogando hoje!</span>
+  </div>
+
+  <button class="btn-primary" onclick="startGame()" id="btn-start" style="margin-top:8px">Vamos Jogar! ✨</button>
+</div>
+
+<!-- ==================== MAP ==================== -->
+<div class="screen" id="screen-map" style="gap:0;padding-top:60px">
+  <div class="player-header">
+    <span class="player-name-tag" id="map-player-name">👑</span>
+    <span class="score-tag" id="map-score">⭐ 0</span>
+  </div>
+  <div class="xp-section">
+    <div class="xp-row">
+      <span class="xp-level" id="xp-level-label">Nível 1</span>
+      <div class="xp-next-preview" id="xp-next-preview">
+        <span id="xp-next-item-emoji"></span>
+        <span id="xp-next-label">0 / 100 XP</span>
+      </div>
+    </div>
+    <div class="xp-bar">
+      <div class="xp-fill" id="xp-fill" style="width:0%"></div>
+      <span class="xp-milestone" id="xp-milestone"></span>
+    </div>
+  </div>
+
+  <div class="farm-scene" style="max-width:500px;width:100%">
+    <div class="farm-sky"></div>
+    <div class="farm-label">Sua Fazenda ✨</div>
+    <div class="farm-elements" id="farm-elements"><span class="farm-item">🌱</span></div>
+  </div>
+
+  <button class="closet-btn" onclick="openCloset()">
+    👗 Closet da Olívia
+    <span class="closet-count" id="closet-count">0</span>
+  </button>
+
+  <h2 class="map-title" id="map-title" style="font-family:'Fredoka One',cursive;font-size:clamp(1.3rem,4vw,1.8rem);color:var(--yellow);text-align:center;margin-bottom:16px;text-shadow:2px 2px 0 rgba(0,0,0,.3)">Escolha sua Fase!</h2>
+  <div class="phases-grid" id="phases-grid"></div>
+</div>
+
+<!-- ==================== GAME ==================== -->
+<div class="screen" id="screen-game" style="padding-top:60px;gap:0">
+  <div class="game-header">
+    <span class="phase-title-game" id="game-phase-title"></span>
+    <div class="game-stats">
+      <div class="combo-badge" id="combo-badge">🔥 x2</div>
+      <span style="color:var(--yellow);font-weight:800;font-size:.95rem" id="game-score-disp">⭐ 0</span>
+      <div class="timer-box" id="timer-box">20</div>
+    </div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  <div class="mission-strip" id="mission-strip">
+    <span class="mission-icon">🎯</span>
+    <span class="mission-text" id="mission-text">Missão</span>
+    <span class="mission-prog" id="mission-prog">0/3</span>
+  </div>
+  <div class="question-box" id="question-box">
+    <span class="question-label" id="question-label"></span>
+    <span class="word-foreign" id="word-foreign"></span>
+    <span class="word-native" id="word-native"></span>
+    <button class="speak-btn" onclick="speakCurrent()">🔊</button>
+  </div>
+  <div class="options-grid opts-4" id="options-grid"></div>
+  <div class="olivia-wrap" style="margin-top:12px">
+    <div class="speech-bubble" id="game-bubble" style="display:none"></div>
+    <svg class="olivia-svg" id="olivia-game" width="90" height="143" viewBox="0 0 200 320" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+</div>
+
+<!-- ==================== RESULT ==================== -->
+<div class="screen" id="screen-result" style="justify-content:center;gap:12px">
+  <div class="result-stars" id="result-stars"></div>
+  <h2 class="result-title" id="result-title"></h2>
+  <p class="result-score" id="result-score-text"></p>
+  <div class="result-missions" id="result-missions"></div>
+  <div class="olivia-wrap">
+    <div class="speech-bubble" id="result-olivia-bubble" style="display:none"></div>
+    <svg class="olivia-svg" width="140" height="222" viewBox="0 0 200 320" xmlns="http://www.w3.org/2000/svg" id="olivia-result"></svg>
+  </div>
+  <div class="result-btns">
+    <button class="btn-primary" id="btn-next-phase" onclick="nextPhase()">Próxima Fase ➡</button>
+    <button class="btn-secondary" onclick="replayPhase()">Repetir 🔄</button>
+    <button class="btn-secondary" onclick="showMap()">Mapa 🗺</button>
+  </div>
+</div>
+
+<!-- ==================== RANKING ==================== -->
+<div class="screen" id="screen-ranking" style="padding-top:70px;gap:0">
+  <h2 style="font-family:'Fredoka One',cursive;font-size:clamp(1.3rem,4vw,1.8rem);color:var(--yellow);text-align:center;margin-bottom:16px">🏆 Ranking</h2>
+  <div class="ranking-list" id="ranking-list"></div>
+  <button class="btn-secondary" onclick="showMap()">Voltar 🔙</button>
+</div>
+
+<script>
+// ============================
+// CONTENT
+// ============================
+const ITEMS = [
+  {id:'crown_pink',emoji:'👑',name:{pt:'Coroa Rosa',en:'Pink Crown',fr:'Couronne Rose'},reqLevel:1},
+  {id:'wings',emoji:'🦋',name:{pt:'Asas de Fada',en:'Fairy Wings',fr:'Ailes de Fée'},reqLevel:2},
+  {id:'necklace',emoji:'📿',name:{pt:'Colar de Pérolas',en:'Pearl Necklace',fr:'Collier de Perles'},reqLevel:3},
+  {id:'dress_pink',emoji:'👗',name:{pt:'Vestido Rosa',en:'Pink Dress',fr:'Robe Rose'},reqLevel:4},
+  {id:'wand_star',emoji:'⭐',name:{pt:'Varinha Estrela',en:'Star Wand',fr:'Baguette Étoile'},reqLevel:5},
+  {id:'tiara',emoji:'💎',name:{pt:'Tiara de Diamante',en:'Diamond Tiara',fr:'Tiare de Diamant'},reqLevel:6},
+  {id:'dress_purple',emoji:'🫐',name:{pt:'Vestido Roxo',en:'Purple Dress',fr:'Robe Violette'},reqLevel:7},
+  {id:'shoes',emoji:'👠',name:{pt:'Sapatinhos Mágicos',en:'Magic Shoes',fr:'Chaussures Magiques'},reqLevel:8},
+  {id:'cape',emoji:'🌙',name:{pt:'Capa Lunar',en:'Moon Cape',fr:'Cape Lunaire'},reqLevel:9},
+  {id:'flower_crown',emoji:'🌸',name:{pt:'Coroa de Flores',en:'Flower Crown',fr:'Couronne de Fleurs'},reqLevel:10},
+  {id:'magic_bag',emoji:'✨',name:{pt:'Bolsa Mágica',en:'Magic Bag',fr:'Sac Magique'},reqLevel:11},
+  {id:'rainbow_dress',emoji:'🌈',name:{pt:'Vestido Arco-Íris',en:'Rainbow Dress',fr:'Robe Arc-en-ciel'},reqLevel:12},
+];
+
+const XP_PER_LEVEL = [0,100,220,360,520,700,900,1120,1360,1620,1900,2200,2520];
+
+const PHASE_NARRATIVES = {
+  pt:[
+    'O galinheiro mágico precisa de você! Responda certo e os pintinhos voltam para casa! 🐔',
+    'As flores do jardim encantado estão esperando! Acerte as cores e elas florescem! 🌸',
+    'O celeiro mágico está cheio de formas escondidas! Descubra todas! 🏚',
+    'Os animais do rio adoram brincar! Chame todos pelo nome! 🦆',
+    'É hora da grande festa! A fazenda está quase completa! 🎉'
+  ],
+  en:[
+    'The magic chicken coop needs you! Answer right and the chicks come home! 🐔',
+    'The enchanted garden flowers are waiting! Get the colors right and they bloom! 🌸',
+    'The magic barn is full of hidden shapes! Discover them all! 🏚',
+    'The river animals love to play! Call them all by name! 🦆',
+    'Time for the big party! The farm is almost complete! 🎉'
+  ],
+  fr:[
+    'Le poulailler magique a besoin de toi! Réponds bien et les poussins rentrent! 🐔',
+    'Les fleurs du jardin enchanté t\'attendent! Trouve les couleurs et elles fleurissent! 🌸',
+    'La grange magique est pleine de formes cachées! Découvre-les toutes! 🏚',
+    'Les animaux de la rivière adorent jouer! Appelle-les tous par leur nom! 🦆',
+    'C\'est l\'heure de la grande fête! La ferme est presque complète! 🎉'
+  ]
+};
+
+const SESSION_TEASERS = {
+  pt:[
+    'Amanhã a Olívia vai receber uma visita surpresa na fazenda! 👀',
+    'Um animal misterioso está chegando na fazenda! Volte para descobrir! 🌟',
+    'Sua fazenda está crescendo! Volte amanhã para ver as novidades! ✨',
+    'A Olívia tem uma missão especial esperando por você! 🎯',
+    'Um baú mágico vai aparecer na sua próxima sessão! 🎁'
+  ],
+  en:[
+    'Tomorrow Olivia will receive a surprise visitor on the farm! 👀',
+    'A mysterious animal is coming to the farm! Come back to find out! 🌟',
+    'Your farm is growing! Come back tomorrow to see what\'s new! ✨',
+    'Olivia has a special mission waiting for you! 🎯',
+    'A magic chest will appear in your next session! 🎁'
+  ],
+  fr:[
+    'Demain Olivia recevra une visite surprise à la ferme! 👀',
+    'Un animal mystérieux arrive à la ferme! Reviens pour découvrir! 🌟',
+    'Ta ferme grandit! Reviens demain pour voir les nouveautés! ✨',
+    'Olivia a une mission spéciale qui t\'attend! 🎯',
+    'Un coffre magique apparaîtra dans ta prochaine session! 🎁'
+  ]
+};
+
+const UI = {
+  pt:{
+    welcome:'Olá! Eu sou a Princesa Olívia! 🌟',
+    narrative:'A Princesa Olívia está construindo a fazenda mais mágica do reino! Cada resposta certa faz a fazenda crescer e ganhar um novo morador!',
+    social:'4.231 crianças estão jogando hoje!',
+    startBtn:'Vamos Jogar! ✨',
+    choosePhase:'Escolha sua Fase!',
+    correct:['Muito bem! 🌟','Incrível! ✨','Perfeito! 🎉','Arrasou! 💫','Que inteligente! 🌈'],
+    wrong:['Quase! Tente de novo!','Não foi desta vez...','Continue tentando! 💪','Olha de novo! 👀'],
+    resGreat:'Perfeita! Você é incrível! 🌟',
+    resGood:'Muito bem! Continue assim! ✨',
+    resOk:'Boa tentativa! Tente de novo! 💪',
+    nextPhase:'Próxima Fase ➡',
+    hint:['Aperte a imagem certa!','Qual deles é correto?','Você consegue! 💪','Pense bem!','Olha as opções!'],
+    combo:['Combo!','Incrível!','Em chamas! 🔥','Imparável! ⚡','Lendária! 👑'],
+    levelUp:'Level Up!',
+    chestTitle:'Baú do Tesouro!',
+    missionComplete:'Missão completa! 🎉',
+    missionLabel:'🎯 Missões da Fase',
+    letsGo:'Vamos lá! 🌟',
+    back:'Voltar',
+    sessionTitle:'Até logo! ✨',
+    sessionMsg:'Você jogou muito bem hoje! A fazenda está crescendo!',
+    nextItemLabel:'Próximo item:',
+    teaserLocked:'Desbloqueie para descobrir!',
+    settings:'Configurações',
+    yourName:'Seu nome:',
+    save:'Salvar ✨',
+    close:'Fechar'
+  },
+  en:{
+    welcome:"Hello! I'm Princess Olivia! 🌟",
+    narrative:'Princess Olivia is building the most magical farm in the kingdom! Each right answer makes the farm grow and gain a new resident!',
+    social:'4,231 kids are playing today!',
+    startBtn:"Let's Play! ✨",
+    choosePhase:'Choose your Phase!',
+    correct:['Great job! 🌟','Amazing! ✨','Perfect! 🎉','You rock! 💫','So smart! 🌈'],
+    wrong:['Almost! Try again!','Not this time...','Keep trying! 💪','Look again! 👀'],
+    resGreat:'Perfect! You are incredible! 🌟',
+    resGood:'Great job! Keep it up! ✨',
+    resOk:'Good try! Try again! 💪',
+    nextPhase:'Next Phase ➡',
+    hint:['Tap the right picture!','Which one is correct?','You can do it! 💪','Think carefully!','Look at the options!'],
+    combo:['Combo!','Incredible!','On fire! 🔥','Unstoppable! ⚡','Legendary! 👑'],
+    levelUp:'Level Up!',
+    chestTitle:'Treasure Chest!',
+    missionComplete:'Mission complete! 🎉',
+    missionLabel:'🎯 Phase Missions',
+    letsGo:"Let's go! 🌟",
+    back:'Back',
+    sessionTitle:'See you! ✨',
+    sessionMsg:'You played really well today! The farm is growing!',
+    nextItemLabel:'Next item:',
+    teaserLocked:'Unlock to find out!',
+    settings:'Settings',
+    yourName:'Your name:',
+    save:'Save ✨',
+    close:'Close'
+  },
+  fr:{
+    welcome:"Bonjour! Je suis la Princesse Olivia! 🌟",
+    narrative:'La Princesse Olivia construit la ferme la plus magique du royaume! Chaque bonne réponse fait grandir la ferme!',
+    social:'4 231 enfants jouent aujourd\'hui!',
+    startBtn:"Jouons! ✨",
+    choosePhase:'Choisissez votre Phase!',
+    correct:['Très bien! 🌟','Incroyable! ✨','Parfait! 🎉','Bravo! 💫','Comme tu es intelligente! 🌈'],
+    wrong:['Presque! Essaie encore!','Pas cette fois...','Continue! 💪','Regarde encore! 👀'],
+    resGreat:'Parfaite! Tu es incroyable! 🌟',
+    resGood:'Très bien! Continue comme ça! ✨',
+    resOk:'Bonne tentative! Essaie encore! 💪',
+    nextPhase:'Phase Suivante ➡',
+    hint:['Touche la bonne image!','Lequel est correct?','Tu peux le faire! 💪','Réfléchis bien!','Regarde les options!'],
+    combo:['Combo!','Incroyable!','En feu! 🔥','Inarrêtable! ⚡','Légendaire! 👑'],
+    levelUp:'Niveau Supérieur!',
+    chestTitle:'Coffre au Trésor!',
+    missionComplete:'Mission accomplie! 🎉',
+    missionLabel:'🎯 Missions de la Phase',
+    letsGo:'Allons-y! 🌟',
+    back:'Retour',
+    sessionTitle:'À bientôt! ✨',
+    sessionMsg:'Tu as très bien joué aujourd\'hui! La ferme grandit!',
+    nextItemLabel:'Prochain objet:',
+    teaserLocked:'Débloque pour découvrir!',
+    settings:'Paramètres',
+    yourName:'Ton prénom:',
+    save:'Sauvegarder ✨',
+    close:'Fermer'
+  }
+};
+
+const FARM_STAGES = [
+  ['🌱'],['🌱','🌿'],['🌿','🌿','🐔'],['🌿','🐔','🌻'],
+  ['🐔','🌻','🌾','🌲'],['🌻','🌾','🌲','🦆','🐄'],
+  ['🌲','🦆','🐄','🌸','🏡'],['🏡','🌸','🐄','🌲','🌻','🦆'],
+  ['🏡','🌸','🐄','🌲','🌻','🦆','🎠'],
+  ['🏰','🌸','🌟','🐄','🌲','🌻','🦆','🎠','🎡']
+];
+
+// Options count per phase (first phase = 2 opts, scales up)
+const PHASE_OPT_COUNT = [2, 3, 3, 4, 4];
+
+const PHASES = [
+  {id:1,emoji:'🐔',colors:['#FF6B9D','#C084FC'],
+   theme:{pt:'Galinheiro',en:'Chicken Coop',fr:'Poulailler'},
+   desc:{pt:'Contar ovos',en:'Count eggs',fr:'Compter les oeufs'},
+   farmItem:'🐔',
+   missions:[
+     {id:'combo3',label:{pt:'Acerte 3 seguidas!',en:'3 in a row!',fr:'3 bonnes réponses!'},target:3,type:'combo'},
+     {id:'fast3',label:{pt:'Responda em menos de 10s!',en:'Answer in under 10s!',fr:'Répondez en moins de 10s!'},target:3,type:'fast'},
+     {id:'perfect',label:{pt:'Sem nenhum erro!',en:'No mistakes!',fr:'Sans erreurs!'},target:1,type:'perfect'}
+   ],
+   questions:[
+     {word:{pt:'UM',en:'ONE',fr:'UN'},native:{pt:'',en:'Um',fr:'Um'},
+      question:{pt:'Aperte o grupo com UM ovo!',en:'Tap the group with ONE egg!',fr:'Touche le groupe avec UN oeuf!'},
+      options:[
+        {emoji:'🥚',word:{pt:'Um ovo',en:'One egg',fr:'Un oeuf'},correct:true},
+        {emoji:'🥚🥚',word:{pt:'Dois ovos',en:'Two eggs',fr:'Deux oeufs'},correct:false},
+        {emoji:'🥚🥚🥚',word:{pt:'Três ovos',en:'Three eggs',fr:'Trois oeufs'},correct:false},
+        {emoji:'🐔',word:{pt:'Galinha',en:'Hen',fr:'Poule'},correct:false}
+      ]},
+     {word:{pt:'DOIS',en:'TWO',fr:'DEUX'},native:{pt:'',en:'Dois',fr:'Dois'},
+      question:{pt:'Qual grupo tem DOIS ovos?',en:'Which group has TWO eggs?',fr:'Quel groupe a DEUX oeufs?'},
+      options:[
+        {emoji:'🥚',word:{pt:'Um ovo',en:'One egg',fr:'Un oeuf'},correct:false},
+        {emoji:'🥚🥚',word:{pt:'Dois ovos',en:'Two eggs',fr:'Deux oeufs'},correct:true},
+        {emoji:'🐓',word:{pt:'Galo',en:'Rooster',fr:'Coq'},correct:false},
+        {emoji:'🥚🥚🥚',word:{pt:'Três ovos',en:'Three eggs',fr:'Trois oeufs'},correct:false}
+      ]},
+     {word:{pt:'TRÊS',en:'THREE',fr:'TROIS'},native:{pt:'',en:'Três',fr:'Trois'},
+      question:{pt:'Encontre os TRÊS ovos!',en:'Find THREE eggs!',fr:'Trouve les TROIS oeufs!'},
+      options:[
+        {emoji:'🥚🥚🥚🥚',word:{pt:'Quatro ovos',en:'Four eggs',fr:'Quatre oeufs'},correct:false},
+        {emoji:'🥚🥚',word:{pt:'Dois ovos',en:'Two eggs',fr:'Deux oeufs'},correct:false},
+        {emoji:'🥚🥚🥚',word:{pt:'Três ovos',en:'Three eggs',fr:'Trois oeufs'},correct:true},
+        {emoji:'🐔',word:{pt:'Galinha',en:'Hen',fr:'Poule'},correct:false}
+      ]},
+     {word:{pt:'QUATRO',en:'FOUR',fr:'QUATRE'},native:{pt:'',en:'Quatro',fr:'Quatre'},
+      question:{pt:'Qual é o grupo com QUATRO ovos?',en:'Which group has FOUR eggs?',fr:'Quel groupe a QUATRE oeufs?'},
+      options:[
+        {emoji:'🥚🥚🥚',word:{pt:'Três ovos',en:'Three eggs',fr:'Trois oeufs'},correct:false},
+        {emoji:'🥚🥚🥚🥚',word:{pt:'Quatro ovos',en:'Four eggs',fr:'Quatre oeufs'},correct:true},
+        {emoji:'🥚',word:{pt:'Um ovo',en:'One egg',fr:'Un oeuf'},correct:false},
+        {emoji:'🐣',word:{pt:'Pintinho',en:'Chick',fr:'Poussin'},correct:false}
+      ]},
+     {word:{pt:'CINCO',en:'FIVE',fr:'CINQ'},native:{pt:'',en:'Cinco',fr:'Cinq'},
+      question:{pt:'Mostre os CINCO ovos da fazenda!',en:'Show FIVE farm eggs!',fr:'Montre les CINQ oeufs de la ferme!'},
+      options:[
+        {emoji:'🥚🥚🥚🥚',word:{pt:'Quatro ovos',en:'Four eggs',fr:'Quatre oeufs'},correct:false},
+        {emoji:'🐣',word:{pt:'Pintinho',en:'Chick',fr:'Poussin'},correct:false},
+        {emoji:'🥚🥚🥚',word:{pt:'Três ovos',en:'Three eggs',fr:'Trois oeufs'},correct:false},
+        {emoji:'🥚🥚🥚🥚🥚',word:{pt:'Cinco ovos',en:'Five eggs',fr:'Cinq oeufs'},correct:true}
+      ]}
+   ]},
+  {id:2,emoji:'🌸',colors:['#F472B6','#FB923C'],
+   theme:{pt:'Jardim Encantado',en:'Magic Garden',fr:'Jardin Enchanté'},
+   desc:{pt:'Cores das flores',en:'Flower colors',fr:'Couleurs des fleurs'},
+   farmItem:'🌻',
+   missions:[
+     {id:'combo3',label:{pt:'Acerte 3 seguidas!',en:'3 in a row!',fr:'3 de suite!'},target:3,type:'combo'},
+     {id:'fast3',label:{pt:'Menos de 8 segundos!',en:'Under 8 seconds!',fr:'Moins de 8 secondes!'},target:3,type:'fast'},
+     {id:'perfect',label:{pt:'Sem erros!',en:'No mistakes!',fr:'Sans erreurs!'},target:1,type:'perfect'}
+   ],
+   questions:[
+     {word:{pt:'VERMELHO',en:'RED',fr:'ROUGE'},native:{pt:'',en:'Vermelho',fr:'Vermelho'},
+      question:{pt:'Qual flor é VERMELHA?',en:'Which flower is RED?',fr:'Quelle fleur est ROUGE?'},
+      options:[
+        {emoji:'🌹',word:{pt:'Flor Vermelha',en:'Red Flower',fr:'Fleur Rouge'},correct:true},
+        {emoji:'🌻',word:{pt:'Flor Amarela',en:'Yellow Flower',fr:'Fleur Jaune'},correct:false},
+        {emoji:'🌸',word:{pt:'Flor Rosa',en:'Pink Flower',fr:'Fleur Rose'},correct:false},
+        {emoji:'🪷',word:{pt:'Flor Roxa',en:'Purple Flower',fr:'Fleur Violette'},correct:false}
+      ]},
+     {word:{pt:'AMARELO',en:'YELLOW',fr:'JAUNE'},native:{pt:'',en:'Amarelo',fr:'Jaune'},
+      question:{pt:'Qual flor é AMARELA?',en:'Which flower is YELLOW?',fr:'Quelle fleur est JAUNE?'},
+      options:[
+        {emoji:'🌺',word:{pt:'Flor Laranja',en:'Orange Flower',fr:'Fleur Orange'},correct:false},
+        {emoji:'🌻',word:{pt:'Flor Amarela',en:'Yellow Flower',fr:'Fleur Jaune'},correct:true},
+        {emoji:'🪷',word:{pt:'Flor Roxa',en:'Purple Flower',fr:'Fleur Violette'},correct:false},
+        {emoji:'🌹',word:{pt:'Flor Vermelha',en:'Red Flower',fr:'Fleur Rouge'},correct:false}
+      ]},
+     {word:{pt:'AZUL',en:'BLUE',fr:'BLEU'},native:{pt:'',en:'Azul',fr:'Bleu'},
+      question:{pt:'Aperte a flor AZUL!',en:'Tap the BLUE flower!',fr:'Touche la fleur BLEUE!'},
+      options:[
+        {emoji:'🌹',word:{pt:'Flor Vermelha',en:'Red Flower',fr:'Fleur Rouge'},correct:false},
+        {emoji:'🌻',word:{pt:'Flor Amarela',en:'Yellow Flower',fr:'Fleur Jaune'},correct:false},
+        {emoji:'🪻',word:{pt:'Flor Azul',en:'Blue Flower',fr:'Fleur Bleue'},correct:true},
+        {emoji:'🌸',word:{pt:'Flor Rosa',en:'Pink Flower',fr:'Fleur Rose'},correct:false}
+      ]},
+     {word:{pt:'ROSA',en:'PINK',fr:'ROSE'},native:{pt:'',en:'Rosa',fr:'Rose'},
+      question:{pt:'Qual flor é da cor ROSA?',en:'Which flower is PINK?',fr:'Quelle fleur est ROSE?'},
+      options:[
+        {emoji:'🌸',word:{pt:'Flor Rosa',en:'Pink Flower',fr:'Fleur Rose'},correct:true},
+        {emoji:'🌿',word:{pt:'Folha Verde',en:'Green Leaf',fr:'Feuille Verte'},correct:false},
+        {emoji:'🪻',word:{pt:'Flor Azul',en:'Blue Flower',fr:'Fleur Bleue'},correct:false},
+        {emoji:'🌻',word:{pt:'Flor Amarela',en:'Yellow Flower',fr:'Fleur Jaune'},correct:false}
+      ]},
+     {word:{pt:'ROXO',en:'PURPLE',fr:'VIOLET'},native:{pt:'',en:'Roxo',fr:'Violet'},
+      question:{pt:'Encontre a flor ROXA!',en:'Find the PURPLE flower!',fr:'Trouve la fleur VIOLETTE!'},
+      options:[
+        {emoji:'🌹',word:{pt:'Flor Vermelha',en:'Red Flower',fr:'Fleur Rouge'},correct:false},
+        {emoji:'🌸',word:{pt:'Flor Rosa',en:'Pink Flower',fr:'Fleur Rose'},correct:false},
+        {emoji:'🌻',word:{pt:'Flor Amarela',en:'Yellow Flower',fr:'Fleur Jaune'},correct:false},
+        {emoji:'🪷',word:{pt:'Flor Roxa',en:'Purple Flower',fr:'Fleur Violette'},correct:true}
+      ]}
+   ]},
+  {id:3,emoji:'🏚',colors:['#34D399','#60A5FA'],
+   theme:{pt:'Celeiro Mágico',en:'Magic Barn',fr:'Grange Magique'},
+   desc:{pt:'Formas geométricas',en:'Geometric shapes',fr:'Formes géométriques'},
+   farmItem:'🌾',
+   missions:[
+     {id:'combo3',label:{pt:'Acerte 3 seguidas!',en:'3 in a row!',fr:'3 de suite!'},target:3,type:'combo'},
+     {id:'fast3',label:{pt:'Velocidade!',en:'Speed!',fr:'Vitesse!'},target:3,type:'fast'},
+     {id:'perfect',label:{pt:'Sem erros!',en:'No mistakes!',fr:'Sans erreurs!'},target:1,type:'perfect'}
+   ],
+   questions:[
+     {word:{pt:'CÍRCULO',en:'CIRCLE',fr:'CERCLE'},native:{pt:'',en:'Círculo',fr:'Cercle'},
+      question:{pt:'Qual é o CÍRCULO?',en:'Which one is the CIRCLE?',fr:'Lequel est le CERCLE?'},
+      options:[
+        {emoji:'⭕',word:{pt:'Círculo',en:'Circle',fr:'Cercle'},correct:true},
+        {emoji:'🔺',word:{pt:'Triângulo',en:'Triangle',fr:'Triangle'},correct:false},
+        {emoji:'🟦',word:{pt:'Quadrado',en:'Square',fr:'Carré'},correct:false},
+        {emoji:'⭐',word:{pt:'Estrela',en:'Star',fr:'Étoile'},correct:false}
+      ]},
+     {word:{pt:'TRIÂNGULO',en:'TRIANGLE',fr:'TRIANGLE'},native:{pt:'',en:'Triângulo',fr:'Triangle'},
+      question:{pt:'Aperte o TRIÂNGULO!',en:'Tap the TRIANGLE!',fr:'Touche le TRIANGLE!'},
+      options:[
+        {emoji:'⭕',word:{pt:'Círculo',en:'Circle',fr:'Cercle'},correct:false},
+        {emoji:'🔺',word:{pt:'Triângulo',en:'Triangle',fr:'Triangle'},correct:true},
+        {emoji:'🟦',word:{pt:'Quadrado',en:'Square',fr:'Carré'},correct:false},
+        {emoji:'♦️',word:{pt:'Losango',en:'Diamond',fr:'Losange'},correct:false}
+      ]},
+     {word:{pt:'QUADRADO',en:'SQUARE',fr:'CARRÉ'},native:{pt:'',en:'Quadrado',fr:'Carré'},
+      question:{pt:'Qual forma é um QUADRADO?',en:'Which shape is a SQUARE?',fr:'Quelle forme est un CARRÉ?'},
+      options:[
+        {emoji:'🔺',word:{pt:'Triângulo',en:'Triangle',fr:'Triangle'},correct:false},
+        {emoji:'⭕',word:{pt:'Círculo',en:'Circle',fr:'Cercle'},correct:false},
+        {emoji:'⭐',word:{pt:'Estrela',en:'Star',fr:'Étoile'},correct:false},
+        {emoji:'🟦',word:{pt:'Quadrado',en:'Square',fr:'Carré'},correct:true}
+      ]},
+     {word:{pt:'ESTRELA',en:'STAR',fr:'ÉTOILE'},native:{pt:'',en:'Estrela',fr:'Étoile'},
+      question:{pt:'Encontre a ESTRELA!',en:'Find the STAR!',fr:'Trouve l\'ÉTOILE!'},
+      options:[
+        {emoji:'⭐',word:{pt:'Estrela',en:'Star',fr:'Étoile'},correct:true},
+        {emoji:'🟦',word:{pt:'Quadrado',en:'Square',fr:'Carré'},correct:false},
+        {emoji:'⭕',word:{pt:'Círculo',en:'Circle',fr:'Cercle'},correct:false},
+        {emoji:'🔺',word:{pt:'Triângulo',en:'Triangle',fr:'Triangle'},correct:false}
+      ]},
+     {word:{pt:'CORAÇÃO',en:'HEART',fr:'COEUR'},native:{pt:'',en:'Coração',fr:'Coeur'},
+      question:{pt:'Aperte o CORAÇÃO da Olívia!',en:'Tap Olivia\'s HEART!',fr:'Touche le COEUR d\'Olivia!'},
+      options:[
+        {emoji:'⭐',word:{pt:'Estrela',en:'Star',fr:'Étoile'},correct:false},
+        {emoji:'❤️',word:{pt:'Coração',en:'Heart',fr:'Coeur'},correct:true},
+        {emoji:'🔺',word:{pt:'Triângulo',en:'Triangle',fr:'Triangle'},correct:false},
+        {emoji:'⭕',word:{pt:'Círculo',en:'Circle',fr:'Cercle'},correct:false}
+      ]}
+   ]},
+  {id:4,emoji:'🦆',colors:['#38BDF8','#22D3EE'],
+   theme:{pt:'Rio da Fazenda',en:'Farm River',fr:'Rivière de la Ferme'},
+   desc:{pt:'Animais e sons',en:'Animals and sounds',fr:'Animaux et sons'},
+   farmItem:'🦆',
+   missions:[
+     {id:'combo3',label:{pt:'Acerte 3 seguidas!',en:'3 in a row!',fr:'3 de suite!'},target:3,type:'combo'},
+     {id:'fast3',label:{pt:'Super velocidade!',en:'Super speed!',fr:'Super vitesse!'},target:3,type:'fast'},
+     {id:'perfect',label:{pt:'Sem erros!',en:'No mistakes!',fr:'Sans erreurs!'},target:1,type:'perfect'}
+   ],
+   questions:[
+     {word:{pt:'PATO',en:'DUCK',fr:'CANARD'},native:{pt:'',en:'Pato',fr:'Pato'},
+      question:{pt:'Qual é o PATO?',en:'Which one is the DUCK?',fr:'Lequel est le CANARD?'},
+      options:[
+        {emoji:'🐸',word:{pt:'Sapo',en:'Frog',fr:'Grenouille'},correct:false},
+        {emoji:'🦆',word:{pt:'Pato',en:'Duck',fr:'Canard'},correct:true},
+        {emoji:'🐟',word:{pt:'Peixe',en:'Fish',fr:'Poisson'},correct:false},
+        {emoji:'🐢',word:{pt:'Tartaruga',en:'Turtle',fr:'Tortue'},correct:false}
+      ]},
+     {word:{pt:'SAPO',en:'FROG',fr:'GRENOUILLE'},native:{pt:'',en:'Sapo',fr:'Grenouille'},
+      question:{pt:'Encontre o SAPO!',en:'Find the FROG!',fr:'Trouve la GRENOUILLE!'},
+      options:[
+        {emoji:'🦆',word:{pt:'Pato',en:'Duck',fr:'Canard'},correct:false},
+        {emoji:'🐢',word:{pt:'Tartaruga',en:'Turtle',fr:'Tortue'},correct:false},
+        {emoji:'🐸',word:{pt:'Sapo',en:'Frog',fr:'Grenouille'},correct:true},
+        {emoji:'🐟',word:{pt:'Peixe',en:'Fish',fr:'Poisson'},correct:false}
+      ]},
+     {word:{pt:'PEIXE',en:'FISH',fr:'POISSON'},native:{pt:'',en:'Peixe',fr:'Poisson'},
+      question:{pt:'Aperte o PEIXE do rio!',en:'Tap the river FISH!',fr:'Touche le POISSON de la rivière!'},
+      options:[
+        {emoji:'🐟',word:{pt:'Peixe',en:'Fish',fr:'Poisson'},correct:true},
+        {emoji:'🐸',word:{pt:'Sapo',en:'Frog',fr:'Grenouille'},correct:false},
+        {emoji:'🦆',word:{pt:'Pato',en:'Duck',fr:'Canard'},correct:false},
+        {emoji:'🐛',word:{pt:'Minhoca',en:'Worm',fr:'Ver'},correct:false}
+      ]},
+     {word:{pt:'TARTARUGA',en:'TURTLE',fr:'TORTUE'},native:{pt:'',en:'Tartaruga',fr:'Tortue'},
+      question:{pt:'Qual é a TARTARUGA?',en:'Which is the TURTLE?',fr:'Laquelle est la TORTUE?'},
+      options:[
+        {emoji:'🐟',word:{pt:'Peixe',en:'Fish',fr:'Poisson'},correct:false},
+        {emoji:'🐢',word:{pt:'Tartaruga',en:'Turtle',fr:'Tortue'},correct:true},
+        {emoji:'🐸',word:{pt:'Sapo',en:'Frog',fr:'Grenouille'},correct:false},
+        {emoji:'🦆',word:{pt:'Pato',en:'Duck',fr:'Canard'},correct:false}
+      ]},
+     {word:{pt:'BORBOLETA',en:'BUTTERFLY',fr:'PAPILLON'},native:{pt:'',en:'Borboleta',fr:'Papillon'},
+      question:{pt:'Encontre a BORBOLETA!',en:'Find the BUTTERFLY!',fr:'Trouve le PAPILLON!'},
+      options:[
+        {emoji:'🐸',word:{pt:'Sapo',en:'Frog',fr:'Grenouille'},correct:false},
+        {emoji:'🐟',word:{pt:'Peixe',en:'Fish',fr:'Poisson'},correct:false},
+        {emoji:'🦆',word:{pt:'Pato',en:'Duck',fr:'Canard'},correct:false},
+        {emoji:'🦋',word:{pt:'Borboleta',en:'Butterfly',fr:'Papillon'},correct:true}
+      ]}
+   ]},
+  {id:5,emoji:'🎉',colors:['#F59E0B','#EF4444'],
+   theme:{pt:'Grande Festa!',en:'Big Party!',fr:'Grande Fête!'},
+   desc:{pt:'Tudo junto!',en:'Everything together!',fr:'Tout ensemble!'},
+   farmItem:'🎠',
+   missions:[
+     {id:'combo5',label:{pt:'Acerte 5 seguidas!',en:'5 in a row!',fr:'5 de suite!'},target:5,type:'combo'},
+     {id:'fast3',label:{pt:'Super velocidade!',en:'Super speed!',fr:'Super vitesse!'},target:3,type:'fast'},
+     {id:'perfect',label:{pt:'Nota 10! Sem erros!',en:'Perfect! No mistakes!',fr:'Parfait! Sans erreurs!'},target:1,type:'perfect'}
+   ],
+   questions:[
+     {word:{pt:'VACA',en:'COW',fr:'VACHE'},native:{pt:'',en:'Vaca',fr:'Vache'},
+      question:{pt:'Qual animal é a VACA?',en:'Which animal is the COW?',fr:'Quel animal est la VACHE?'},
+      options:[
+        {emoji:'🐷',word:{pt:'Porco',en:'Pig',fr:'Cochon'},correct:false},
+        {emoji:'🐮',word:{pt:'Vaca',en:'Cow',fr:'Vache'},correct:true},
+        {emoji:'🐑',word:{pt:'Ovelha',en:'Sheep',fr:'Mouton'},correct:false},
+        {emoji:'🐴',word:{pt:'Cavalo',en:'Horse',fr:'Cheval'},correct:false}
+      ]},
+     {word:{pt:'SEIS',en:'SIX',fr:'SIX'},native:{pt:'',en:'Seis',fr:'Six'},
+      question:{pt:'Qual grupo tem SEIS balões?',en:'Which group has SIX balloons?',fr:'Quel groupe a SIX ballons?'},
+      options:[
+        {emoji:'🎈🎈🎈🎈🎈',word:{pt:'Cinco',en:'Five',fr:'Cinq'},correct:false},
+        {emoji:'🎈🎈🎈🎈🎈🎈',word:{pt:'Seis',en:'Six',fr:'Six'},correct:true},
+        {emoji:'🎈🎈🎈🎈',word:{pt:'Quatro',en:'Four',fr:'Quatre'},correct:false},
+        {emoji:'🎈🎈🎈',word:{pt:'Três',en:'Three',fr:'Trois'},correct:false}
+      ]},
+     {word:{pt:'VERDE',en:'GREEN',fr:'VERT'},native:{pt:'',en:'Verde',fr:'Vert'},
+      question:{pt:'Qual flor é VERDE?',en:'Which flower is GREEN?',fr:'Quelle fleur est VERTE?'},
+      options:[
+        {emoji:'🌹',word:{pt:'Flor Vermelha',en:'Red Flower',fr:'Fleur Rouge'},correct:false},
+        {emoji:'🌻',word:{pt:'Flor Amarela',en:'Yellow Flower',fr:'Fleur Jaune'},correct:false},
+        {emoji:'🌿',word:{pt:'Flor Verde',en:'Green Flower',fr:'Fleur Verte'},correct:true},
+        {emoji:'🪻',word:{pt:'Flor Azul',en:'Blue Flower',fr:'Fleur Bleue'},correct:false}
+      ]},
+     {word:{pt:'CAVALO',en:'HORSE',fr:'CHEVAL'},native:{pt:'',en:'Cavalo',fr:'Cheval'},
+      question:{pt:'Encontre o CAVALO da fazenda!',en:'Find the farm HORSE!',fr:'Trouve le CHEVAL de la ferme!'},
+      options:[
+        {emoji:'🐴',word:{pt:'Cavalo',en:'Horse',fr:'Cheval'},correct:true},
+        {emoji:'🐮',word:{pt:'Vaca',en:'Cow',fr:'Vache'},correct:false},
+        {emoji:'🐷',word:{pt:'Porco',en:'Pig',fr:'Cochon'},correct:false},
+        {emoji:'🐑',word:{pt:'Ovelha',en:'Sheep',fr:'Mouton'},correct:false}
+      ]},
+     {word:{pt:'TRIÂNGULO',en:'TRIANGLE',fr:'TRIANGLE'},native:{pt:'',en:'Triângulo',fr:'Triangle'},
+      question:{pt:'Aperte o TRIÂNGULO na festa!',en:'Tap the party TRIANGLE!',fr:'Touche le TRIANGLE de la fête!'},
+      options:[
+        {emoji:'⭕',word:{pt:'Círculo',en:'Circle',fr:'Cercle'},correct:false},
+        {emoji:'🔺',word:{pt:'Triângulo',en:'Triangle',fr:'Triangle'},correct:true},
+        {emoji:'▬',word:{pt:'Retângulo',en:'Rectangle',fr:'Rectangle'},correct:false},
+        {emoji:'⭐',word:{pt:'Estrela',en:'Star',fr:'Étoile'},correct:false}
+      ]}
+   ]}
+];
+
+// ============================
+// STATE
+// ============================
+let S = {
+  lang:'pt', speed:1.0,
+  playerName:'',
+  totalScore:0, xp:0, level:1,
+  phaseStars:[0,0,0,0,0],
+  ownedItems:[], equippedItem:null,
+  currentPhase:0, currentQuestion:0,
+  phaseScore:0, combo:0, maxCombo:0,
+  fastCount:0, errors:0,
+  timer:20, timerInt:null,
+  answered:false,
+  missionDone:[false,false,false],
+  questionStartTime:0,
+  pendingPhase:-1,
+  chestThreshold:0
+};
+
+function resetChestThreshold(){
+  S.chestThreshold = 2 + Math.floor(Math.random()*4); // random between 2-5
+}
+
+// ============================
+// AUDIO
+// ============================
+let actx=null;
+function getCtx(){if(!actx)actx=new(window.AudioContext||window.webkitAudioContext)();return actx}
+function tone(f,d,t='sine',v=.3){
+  try{const c=getCtx(),o=c.createOscillator(),g=c.createGain();
+  o.connect(g);g.connect(c.destination);o.type=t;o.frequency.value=f;
+  g.gain.setValueAtTime(v,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+d);
+  o.start();o.stop(c.currentTime+d)}catch(e){}
+}
+function sndCorrect(){tone(523,.1);setTimeout(()=>tone(659,.1),100);setTimeout(()=>tone(784,.2),200)}
+function sndWrong(){tone(200,.3,'sawtooth',.2)}
+function sndBip(){tone(880,.08,'square',.15)}
+function sndVictory(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,.15),i*120))}
+function sndCombo(n){const freqs=[659,784,880,1047,1175];tone(freqs[Math.min(n-2,4)],.25,'sine',.4)}
+function sndLevelUp(){[523,659,784,1047,1319].forEach((f,i)=>setTimeout(()=>tone(f,.2),i*100))}
+function sndMission(){[659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,.15,'sine',.4),i*80))}
+
+// ============================
+// SPEECH
+// ============================
+const LV={pt:'pt-BR',en:'en-US',fr:'fr-FR'};
+function speak(txt,lg){
+  try{
+    window.speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(txt);
+    u.lang=LV[lg||S.lang];u.rate=S.speed;u.pitch=1.2;
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
+function speakCurrent(){
+  const p=PHASES[S.currentPhase],q=p.questions[S.currentQuestion];
+  speak(q.question[S.lang]);
+}
+
+// ============================
+// STARS BG
+// ============================
+function createStars(){
+  const bg=document.getElementById('stars-bg');
+  for(let i=0;i<80;i++){
+    const s=document.createElement('div');s.className='star';
+    const sz=Math.random()*3+1;
+    s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-duration:${Math.random()*4+2}s;animation-delay:${Math.random()*4}s`;
+    bg.appendChild(s);
+  }
+}
+
+// ============================
+// LANG
+// ============================
+function setLang(l){
+  S.lang=l;
+  document.querySelectorAll('.lang-corner-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('lang-'+l).classList.add('active');
+  updateWelcomeText();
+}
+
+function updateWelcomeText(){
+  const ui=UI[S.lang];
+  const wb=document.getElementById('welcome-bubble');
+  if(wb)wb.textContent=ui.welcome;
+  const nt=document.getElementById('narrative-text');
+  if(nt)nt.textContent=ui.narrative;
+  const sp=document.getElementById('social-proof-text');
+  if(sp)sp.textContent=ui.social;
+  const bs=document.getElementById('btn-start');
+  if(bs)bs.textContent=ui.startBtn;
+  speak(ui.welcome);
+}
+
+// ============================
+// SPEED
+// ============================
+function setSpeed(sp,btn){
+  S.speed=sp;
+  document.querySelectorAll('.speed-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+}
+
+// ============================
+// SCREENS
+// ============================
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('top-bar').style.display=id!=='screen-welcome'?'flex':'none';
+  document.getElementById('lang-corner').style.display='flex';
+}
+
+// ============================
+// SETTINGS
+// ============================
+function openSettings(){
+  document.getElementById('settings-name-input').value=S.playerName;
+  document.getElementById('settings-overlay').classList.add('show');
+}
+function closeSettings(){document.getElementById('settings-overlay').classList.remove('show')}
+function saveSettings(){
+  const name=document.getElementById('settings-name-input').value.trim();
+  if(name){S.playerName=name;savePlayer();}
+  closeSettings();
+  if(document.getElementById('map-player-name'))
+    document.getElementById('map-player-name').textContent='👑 '+S.playerName;
+}
+
+// ============================
+// EXIT HOOK
+// ============================
+function tryExit(){
+  const ui=UI[S.lang];
+  const teaser=SESSION_TEASERS[S.lang][Math.floor(Math.random()*SESSION_TEASERS[S.lang].length)];
+  document.getElementById('se-title').textContent=ui.sessionTitle;
+  document.getElementById('se-msg').textContent=ui.sessionMsg;
+  document.getElementById('se-teaser').textContent=teaser;
+  document.getElementById('session-end-overlay').classList.add('show');
+}
+function closeSessionEnd(){document.getElementById('session-end-overlay').classList.remove('show')}
+function reallyExit(){
+  document.getElementById('session-end-overlay').classList.remove('show');
+  clearTimer();showScreen('screen-welcome');updateWelcomeText();
+}
+
+// ============================
+// PLAYER DATA
+// ============================
+function savePlayer(){
+  const d={name:S.playerName,totalScore:S.totalScore,xp:S.xp,level:S.level,
+    phaseStars:S.phaseStars,ownedItems:S.ownedItems,equippedItem:S.equippedItem,lang:S.lang};
+  localStorage.setItem('olivia_player',JSON.stringify(d));
+  // also save missions per phase
+  for(let i=0;i<5;i++){
+    if(S['missionsDone_'+i]) {
+      const md=JSON.parse(localStorage.getItem('olivia_missions')||'{}');
+      md[i]=S['missionsDone_'+i];
+      localStorage.setItem('olivia_missions',JSON.stringify(md));
+    }
+  }
+  updateRanking();
+}
+function loadPlayer(){
+  const raw=localStorage.getItem('olivia_player');
+  if(raw){
+    const d=JSON.parse(raw);
+    S.playerName=d.name||'';
+    S.totalScore=d.totalScore||0;S.xp=d.xp||0;S.level=d.level||1;
+    S.phaseStars=d.phaseStars||[0,0,0,0,0];
+    S.ownedItems=d.ownedItems||[];S.equippedItem=d.equippedItem||null;
+    if(d.lang)S.lang=d.lang;
+  }
+  const md=JSON.parse(localStorage.getItem('olivia_missions')||'{}');
+  for(let i=0;i<5;i++){if(md[i])S['missionsDone_'+i]=md[i];}
+}
+function updateRanking(){
+  if(!S.playerName)return;
+  let r=JSON.parse(localStorage.getItem('olivia_ranking')||'[]');
+  const idx=r.findIndex(x=>x.name===S.playerName);
+  const e={name:S.playerName,score:S.totalScore,level:S.level};
+  if(idx>=0)r[idx]=e;else r.push(e);
+  r.sort((a,b)=>b.score-a.score);
+  localStorage.setItem('olivia_ranking',JSON.stringify(r.slice(0,10)));
+}
+
+// ============================
+// XP / LEVEL
+// ============================
+function addXP(amount){
+  const oldLevel=S.level;
+  S.xp+=amount;
+  let newLevel=S.level;
+  for(let i=S.level;i<XP_PER_LEVEL.length;i++){
+    if(S.xp>=(XP_PER_LEVEL[i+1]||99999)){newLevel=i+1;}else break;
+  }
+  if(newLevel>oldLevel){
+    S.level=newLevel;
+    const item=ITEMS.find(it=>it.reqLevel===S.level);
+    if(item&&!S.ownedItems.includes(item.id)){
+      S.ownedItems.push(item.id);
+      S.equippedItem=item.id;
+      savePlayer();applyEquippedItem();
+      setTimeout(()=>showLevelUp(S.level,item),800);
+    } else {
+      savePlayer();
+      setTimeout(()=>showLevelUp(S.level,null),800);
+    }
+  }
+}
+function xpNeededForLevel(l){return XP_PER_LEVEL[l]||XP_PER_LEVEL[XP_PER_LEVEL.length-1]}
+function xpProgress(){
+  const cur=xpNeededForLevel(S.level);
+  const nxt=xpNeededForLevel(S.level+1)||cur+500;
+  return Math.min(((S.xp-cur)/(nxt-cur))*100,100);
+}
+function xpToNextLevel(){
+  const nxt=xpNeededForLevel(S.level+1)||xpNeededForLevel(S.level)+500;
+  return Math.max(0,nxt-S.xp);
+}
+
+// ============================
+// START — no name required
+// ============================
+function startGame(){
+  loadPlayer();
+  // assign generic name if none saved
+  if(!S.playerName){
+    const names={pt:'Princesinha',en:'Little Princess',fr:'Petite Princesse'};
+    S.playerName=names[S.lang];
+  }
+  applyEquippedItem();
+  showMap();
+  sndVictory();
+}
+
+// ============================
+// MAP
+// ============================
+function showMap(){
+  clearTimer();showScreen('screen-map');
+  const ui=UI[S.lang];
+  document.getElementById('map-player-name').textContent='👑 '+S.playerName;
+  document.getElementById('map-score').textContent='⭐ '+S.totalScore;
+  document.getElementById('xp-level-label').textContent='Nível '+S.level;
+
+  // XP preview of next item
+  const nextItem=ITEMS.find(it=>it.reqLevel>S.level);
+  const xpLeft=xpToNextLevel();
+  const previewEmoji=nextItem?nextItem.emoji:'🌟';
+  document.getElementById('xp-next-item-emoji').textContent=previewEmoji;
+  document.getElementById('xp-next-label').textContent=ui.nextItemLabel+' '+xpLeft+' XP';
+  document.getElementById('xp-milestone').textContent=nextItem?nextItem.emoji:'✨';
+  setTimeout(()=>{document.getElementById('xp-fill').style.width=xpProgress()+'%'},100);
+
+  // Farm
+  const farmStage=FARM_STAGES[Math.min(S.phaseStars.filter(x=>x>0).length,FARM_STAGES.length-1)];
+  document.getElementById('farm-elements').innerHTML=farmStage.map(e=>`<span class="farm-item">${e}</span>`).join('');
+
+  document.getElementById('closet-count').textContent=S.ownedItems.length;
+
+  // Phases
+  const grid=document.getElementById('phases-grid');
+  grid.innerHTML='';
+  PHASES.forEach((ph,idx)=>{
+    const unlocked=idx===0||S.phaseStars[idx-1]>0;
+    const stars='⭐'.repeat(S.phaseStars[idx])+'☆'.repeat(3-S.phaseStars[idx]);
+    const mDone=S['missionsDone_'+idx]||[false,false,false];
+    const mCount=mDone.filter(Boolean).length;
+    const card=document.createElement('div');
+    card.className='phase-card '+(unlocked?'unlocked':'locked')+(S.phaseStars[idx]>0?' completed':'');
+    card.style.setProperty('--c1',ph.colors[0]);card.style.setProperty('--c2',ph.colors[1]);
+
+    let rightContent='';
+    if(unlocked){
+      rightContent=`<div class="phase-stars">${stars}</div><div class="phase-missions">🎯 ${mCount}/3</div>`;
+    } else {
+      rightContent='<div style="font-size:1.2rem">🔒</div>';
+    }
+
+    // teaser for locked
+    const teaser=!unlocked?`<div class="phase-teaser">${PHASE_NARRATIVES[S.lang][idx]?.substring(0,40)}...</div>`:'';
+
+    card.innerHTML=`
+      <div class="phase-emoji">${ph.emoji}</div>
+      <div class="phase-info">
+        <div class="phase-name">${ph.theme[S.lang]}</div>
+        <div class="phase-desc">${ph.desc[S.lang]}</div>
+        ${teaser}
+      </div>
+      <div class="phase-right">${rightContent}</div>`;
+    if(unlocked) card.onclick=()=>showMissionPreview(idx);
+    grid.appendChild(card);
+  });
+  speak(ui.choosePhase);
+  cloneOliviaTo('olivia-result');
+  cloneOliviaTo('olivia-game');
+}
+
+// ============================
+// MISSION PREVIEW
+// ============================
+function showMissionPreview(idx){
+  S.pendingPhase=idx;
+  const ph=PHASES[idx];
+  const ui=UI[S.lang];
+  document.getElementById('mp-phase-name').textContent=ph.emoji+' '+ph.theme[S.lang];
+  const list=document.getElementById('mp-list');
+  list.innerHTML='';
+  ph.missions.forEach(m=>{
+    const div=document.createElement('div');
+    div.className='mp-item';
+    div.innerHTML=`<span class="mp-icon">🎯</span>
+      <span class="mp-text">${m.label[S.lang]}</span>
+      <span class="mp-reward">+30 XP</span>`;
+    list.appendChild(div);
+  });
+  // narrative
+  const narr=document.createElement('div');
+  narr.style.cssText='background:rgba(253,230,138,.1);border:2px solid rgba(253,230,138,.2);border-radius:12px;padding:10px 12px;color:rgba(255,255,255,.8);font-size:.83rem;font-weight:700;line-height:1.4;margin-top:4px';
+  narr.textContent=PHASE_NARRATIVES[S.lang][idx]||'';
+  list.appendChild(narr);
+  document.getElementById('mp-start-btn').textContent=ui.letsGo;
+  document.getElementById('mission-preview-overlay').classList.add('show');
+  speak(PHASE_NARRATIVES[S.lang][idx]);
+}
+function closeMissionPreview(){
+  document.getElementById('mission-preview-overlay').classList.remove('show');
+  S.pendingPhase=-1;
+}
+function confirmStartPhase(){
+  document.getElementById('mission-preview-overlay').classList.remove('show');
+  if(S.pendingPhase>=0)startPhase(S.pendingPhase);
+}
+
+// ============================
+// GAME
+// ============================
+function startPhase(idx){
+  S.currentPhase=idx;S.currentQuestion=0;S.phaseScore=0;
+  S.combo=0;S.maxCombo=0;S.fastCount=0;S.errors=0;
+  S.missionDone=[false,false,false];
+  S.answered=false;
+  resetChestThreshold();
+  showScreen('screen-game');
+  renderQuestion();
+}
+
+function getOptCount(){
+  const base=PHASE_OPT_COUNT[S.currentPhase]||4;
+  return base;
+}
+
+function renderQuestion(){
+  const ph=PHASES[S.currentPhase];
+  const q=ph.questions[S.currentQuestion];
+  const total=ph.questions.length;
+  const ui=UI[S.lang];
+  const optCount=getOptCount();
+
+  document.getElementById('game-phase-title').textContent=ph.emoji+' '+ph.theme[S.lang];
+  document.getElementById('game-score-disp').textContent='⭐ '+S.phaseScore;
+  document.getElementById('progress-fill').style.width=((S.currentQuestion/total)*100)+'%';
+
+  const mission=ph.missions[0];
+  document.getElementById('mission-text').textContent=mission.label[S.lang];
+  updateMissionProg();
+
+  document.getElementById('question-label').textContent=q.question[S.lang];
+  document.getElementById('word-foreign').textContent=q.word[S.lang];
+  const nat=q.native[S.lang];
+  document.getElementById('word-native').textContent=nat?'('+nat+')':'';
+
+  const cb=document.getElementById('combo-badge');
+  if(S.combo>=2){cb.textContent='🔥 x'+S.combo;cb.classList.add('show')}
+  else cb.classList.remove('show');
+
+  // Build options — slice to optCount, always include correct
+  let opts=[...q.options];
+  const correctOpt=opts.find(o=>o.correct);
+  let wrongOpts=opts.filter(o=>!o.correct);
+  // shuffle wrong
+  wrongOpts=wrongOpts.sort(()=>Math.random()-.5);
+  let chosen=[correctOpt,...wrongOpts.slice(0,optCount-1)];
+  chosen=chosen.sort(()=>Math.random()-.5);
+
+  const grid=document.getElementById('options-grid');
+  grid.className='options-grid opts-'+optCount;
+  grid.innerHTML='';
+  chosen.forEach(opt=>{
+    const c=document.createElement('div');
+    c.className='opt-card';
+    c.innerHTML=`<span class="opt-emoji">${opt.emoji}</span><span class="opt-word">${opt.word[S.lang]}</span>`;
+    c.onclick=()=>handleAnswer(opt.correct,c,q);
+    grid.appendChild(c);
+  });
+
+  const bub=document.getElementById('game-bubble');
+  bub.textContent=ui.hint[Math.floor(Math.random()*ui.hint.length)];
+  bub.style.display='block';
+
+  speak(q.question[S.lang]);
+
+  S.questionStartTime=Date.now();
+  startTimer();
+}
+
+function updateMissionProg(){
+  const ph=PHASES[S.currentPhase];
+  const m=ph.missions[0];
+  let cur=0,target=m.target;
+  if(m.type==='combo')cur=Math.min(S.maxCombo,target);
+  else if(m.type==='fast')cur=Math.min(S.fastCount,target);
+  else if(m.type==='perfect')cur=S.errors===0?1:0;
+  document.getElementById('mission-prog').textContent=cur+'/'+target;
+}
+
+// Adaptive timer: starts at 20s, reduces by 1s per 2 fast answers
+function getTimerDuration(){
+  const base=S.currentPhase<=1?20:15;
+  const reduction=Math.floor(S.fastCount/2);
+  return Math.max(8,base-reduction);
+}
+
+function startTimer(){
+  clearTimer();
+  S.timer=getTimerDuration();S.answered=false;
+  updateTimerDisplay();
+  S.timerInt=setInterval(()=>{
+    S.timer--;updateTimerDisplay();
+    if(S.timer<=3&&S.timer>0){sndBip();if(navigator.vibrate)navigator.vibrate(50)}
+    if(S.timer<=0){clearTimer();handleAnswer(false,null,null)}
+  },1000);
+}
+function clearTimer(){if(S.timerInt){clearInterval(S.timerInt);S.timerInt=null}}
+function updateTimerDisplay(){
+  const b=document.getElementById('timer-box');
+  b.textContent=S.timer;
+  b.className='timer-box'+(S.timer<=3?' urgent':'');
+}
+
+function handleAnswer(correct,card,q){
+  if(S.answered)return;
+  S.answered=true;clearTimer();
+  const ui=UI[S.lang];
+  document.querySelectorAll('.opt-card').forEach(c=>c.classList.add('disabled'));
+  const elapsed=(Date.now()-S.questionStartTime)/1000;
+  const fastThreshold=S.currentPhase<=1?10:8;
+
+  if(correct){
+    if(card)card.classList.add('correct');
+    S.combo++;S.maxCombo=Math.max(S.maxCombo,S.combo);
+    if(elapsed<fastThreshold)S.fastCount++;
+    const pts=Math.max(10,S.timer*10)*(S.combo>=2?S.combo:1);
+    S.phaseScore+=pts;S.totalScore+=pts;
+    sndCorrect();
+    if(navigator.vibrate)navigator.vibrate([50,30,100]);
+    const msg=ui.correct[Math.floor(Math.random()*ui.correct.length)];
+    showFeedback(msg,true);
+    showScorePopup('+'+(S.combo>=2?S.combo+'x ':'')+pts);
+    oliviaAnim('happy');
+
+    // check missions
+    const prevDone=[...S.missionDone];
+    checkMissions();
+    S.missionDone.forEach((done,i)=>{
+      if(done&&!prevDone[i]) showMissionCompletePopup(PHASES[S.currentPhase].missions[i].label[S.lang]);
+    });
+
+    if(S.combo>=2){
+      sndCombo(S.combo);
+      setTimeout(()=>showComboExplosion(S.combo),300);
+      // random chest threshold
+      if(S.combo>=S.chestThreshold){
+        resetChestThreshold();
+        setTimeout(()=>showChest(),1500);
+      }
+    }
+    speak(q?q.word[S.lang]+'! '+msg:msg);
+    updateMissionProg();
+  } else {
+    if(card)card.classList.add('wrong');
+    S.combo=0;S.errors++;
+    // reveal correct
+    document.querySelectorAll('.opt-card').forEach(c=>{
+      const ew=c.querySelector('.opt-emoji');
+      if(!ew)return;
+      const ph=PHASES[S.currentPhase];
+      const qq=ph.questions[S.currentQuestion];
+      const co=qq.options.find(o=>o.correct);
+      if(co&&ew.textContent===co.emoji)c.classList.add('correct');
+    });
+    sndWrong();if(navigator.vibrate)navigator.vibrate([100,50,100]);
+    showFeedback(ui.wrong[Math.floor(Math.random()*ui.wrong.length)],false);
+    oliviaAnim('sad');
+    speak(ui.wrong[0]);
+    updateMissionProg();
+  }
+  // longer display time: 2500ms
+  setTimeout(()=>{hideFeedback();nextQuestion()},2500);
+}
+
+function showMissionCompletePopup(label){
+  const ui=UI[S.lang];
+  const el=document.getElementById('mission-complete-popup');
+  document.getElementById('mcp-text').textContent=ui.missionComplete;
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+  sndMission();
+  setTimeout(()=>el.classList.remove('show'),2600);
+}
+
+function checkMissions(){
+  const ph=PHASES[S.currentPhase];
+  ph.missions.forEach((m,i)=>{
+    if(S.missionDone[i])return;
+    if(m.type==='combo'&&S.maxCombo>=m.target)S.missionDone[i]=true;
+    if(m.type==='fast'&&S.fastCount>=m.target)S.missionDone[i]=true;
+  });
+}
+
+function nextQuestion(){
+  const ph=PHASES[S.currentPhase];
+  S.currentQuestion++;
+  if(S.currentQuestion>=ph.questions.length)endPhase();
+  else renderQuestion();
+}
+
+function endPhase(){
+  clearTimer();
+  const ph=PHASES[S.currentPhase];
+  ph.missions.forEach((m,i)=>{if(m.type==='perfect'&&S.errors===0)S.missionDone[i]=true});
+  S['missionsDone_'+S.currentPhase]=S.missionDone;
+
+  const total=ph.questions.length;
+  const max=total*150*3;
+  const ratio=S.phaseScore/max;
+  let stars=ratio>=.7?3:ratio>=.4?2:1;
+  S.phaseStars[S.currentPhase]=Math.max(S.phaseStars[S.currentPhase],stars);
+
+  const xpGain=stars*50+S.missionDone.filter(Boolean).length*30+Math.min(S.phaseScore/10,100);
+  addXP(Math.floor(xpGain));
+  savePlayer();
+
+  const ui=UI[S.lang];
+  document.getElementById('result-stars').textContent='⭐'.repeat(stars)+'☆'.repeat(3-stars);
+  const title=stars===3?ui.resGreat:stars===2?ui.resGood:ui.resOk;
+  document.getElementById('result-title').textContent=title;
+  document.getElementById('result-score-text').textContent='+ '+S.phaseScore+' pontos | +'+Math.floor(xpGain)+' XP';
+
+  // Mission results
+  const mr=document.getElementById('result-missions');
+  mr.innerHTML='<div style="color:var(--teal);font-weight:800;font-size:.9rem;margin-bottom:6px">Missões:</div>'+
+    ph.missions.map((m,i)=>`<div class="mission-result-item ${S.missionDone[i]?'done':'fail'}">${S.missionDone[i]?'✅':'❌'} ${m.label[S.lang]}</div>`).join('');
+
+  // Olivia result bubble with narrative
+  const robub=document.getElementById('result-olivia-bubble');
+  robub.textContent=title;
+  robub.style.display='block';
+
+  const nb=document.getElementById('btn-next-phase');
+  if(S.currentPhase<PHASES.length-1){nb.style.display='';nb.textContent=ui.nextPhase}
+  else nb.style.display='none';
+
+  showScreen('screen-result');
+  if(stars===3){sndVictory();launchConfetti(60);if(navigator.vibrate)navigator.vibrate([100,50,200,50,300])}
+  else{sndCorrect();launchConfetti(25)}
+  speak(title);
+}
+
+function nextPhase(){
+  if(S.currentPhase<PHASES.length-1)showMissionPreview(S.currentPhase+1);else showMap();
+}
+function replayPhase(){startPhase(S.currentPhase)}
+
+// ============================
+// FEEDBACK
+// ============================
+function showFeedback(txt,ok){
+  const o=document.getElementById('feedback-overlay'),t=document.getElementById('feedback-text');
+  t.textContent=txt;t.className='feedback-text '+(ok?'feedback-correct':'feedback-wrong');
+  o.classList.add('show');
+}
+function hideFeedback(){document.getElementById('feedback-overlay').classList.remove('show')}
+
+function showScorePopup(txt){
+  const el=document.createElement('div');el.className='score-popup';el.textContent=txt;
+  el.style.cssText=`left:${35+Math.random()*30}%;top:35%;`;
+  document.body.appendChild(el);setTimeout(()=>el.remove(),1200);
+}
+
+function showComboExplosion(n){
+  const ui=UI[S.lang];
+  const ce=document.getElementById('combo-explosion');
+  const ct=document.getElementById('combo-text');
+  const label=n>=5?ui.combo[4]:n>=4?ui.combo[3]:n>=3?ui.combo[2]:ui.combo[1];
+  ct.textContent=label+' x'+n;
+  ce.classList.add('show');
+  setTimeout(()=>ce.classList.remove('show'),900);
+}
+
+function oliviaAnim(mood){
+  ['olivia-main','olivia-game','olivia-result'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.className='olivia-svg '+mood;setTimeout(()=>el.className='olivia-svg',700)}
+  });
+}
+
+// ============================
+// CONFETTI
+// ============================
+function launchConfetti(n){
+  const cols=['#FF6B9D','#C084FC','#60A5FA','#FDE68A','#86EFAC','#F59E0B','#2DD4BF'];
+  for(let i=0;i<n;i++){
+    setTimeout(()=>{
+      const el=document.createElement('div');el.className='confetti-piece';
+      el.style.cssText=`left:${Math.random()*100}%;top:-20px;background:${cols[Math.floor(Math.random()*cols.length)]};animation-duration:${1.5+Math.random()*2}s;animation-delay:${Math.random()*.5}s;border-radius:${Math.random()>.5?'50%':'2px'}`;
+      document.body.appendChild(el);setTimeout(()=>el.remove(),3500);
+    },i*25);
+  }
+}
+
+// ============================
+// CHEST — random threshold
+// ============================
+function showChest(){
+  const ui=UI[S.lang];
+  document.getElementById('chest-title').textContent=ui.chestTitle;
+  const unowned=ITEMS.filter(it=>!S.ownedItems.includes(it.id));
+  if(unowned.length>0){
+    const item=unowned[Math.floor(Math.random()*unowned.length)];
+    document.getElementById('chest-item-emoji').textContent=item.emoji;
+    document.getElementById('chest-item-name').textContent=item.name[S.lang];
+    S.ownedItems.push(item.id);
+    S.equippedItem=item.id;
+    savePlayer();applyEquippedItem();
+  } else {
+    document.getElementById('chest-item-emoji').textContent='⭐';
+    document.getElementById('chest-item-name').textContent='+50 XP Bônus!';
+    addXP(50);
+  }
+  document.getElementById('chest-overlay').classList.add('show');
+  sndVictory();launchConfetti(30);
+}
+function closeChest(){document.getElementById('chest-overlay').classList.remove('show')}
+
+// ============================
+// LEVEL UP
+// ============================
+function showLevelUp(level,item){
+  const ui=UI[S.lang];
+  document.getElementById('levelup-title').textContent=ui.levelUp;
+  document.getElementById('levelup-num').textContent=level;
+  if(item){
+    document.getElementById('levelup-item-emoji').textContent=item.emoji;
+    document.getElementById('levelup-item-name').textContent=item.name[S.lang];
+  } else {
+    document.getElementById('levelup-item-emoji').textContent='⭐';
+    document.getElementById('levelup-item-name').textContent='+XP';
+  }
+  document.getElementById('levelup-overlay').classList.add('show');
+  sndLevelUp();launchConfetti(40);
+  speak(ui.levelUp+' Nível '+level+'!');
+}
+function closeLevelUp(){document.getElementById('levelup-overlay').classList.remove('show')}
+
+// ============================
+// CLOSET
+// ============================
+function openCloset(){
+  const grid=document.getElementById('closet-grid');
+  grid.innerHTML='';
+  ITEMS.forEach(item=>{
+    const owned=S.ownedItems.includes(item.id);
+    const equipped=S.equippedItem===item.id;
+    const div=document.createElement('div');
+    div.className='closet-item'+(owned?' owned':'')+(equipped?' equipped':'');
+    div.innerHTML=`<div class="ci-emoji">${owned?item.emoji:'🔒'}</div>
+      <div class="ci-name">${owned?item.name[S.lang]:'???'}</div>
+      ${!owned?`<div class="closet-level-badge">Nv ${item.reqLevel}</div>`:''}`;
+    if(owned)div.onclick=()=>equipItem(item.id);
+    grid.appendChild(div);
+  });
+  document.getElementById('closet-overlay').classList.add('show');
+}
+function closeCloset(){document.getElementById('closet-overlay').classList.remove('show')}
+function equipItem(id){
+  S.equippedItem=id;savePlayer();applyEquippedItem();
+  openCloset();sndCorrect();
+}
+
+// ============================
+// APPLY ITEM
+// ============================
+function applyEquippedItem(){
+  const dressEl=document.getElementById('olivia-dress');
+  const accEl=document.getElementById('acc-layer');
+  const neckEl=document.getElementById('necklace-layer');
+  const wingsEl=document.getElementById('wings-layer');
+  const wandStar=document.getElementById('olivia-wand-star');
+  const crownBase=document.getElementById('crown-base');
+  if(!dressEl)return;
+  accEl.innerHTML='';neckEl.innerHTML='';wingsEl.innerHTML='';
+  dressEl.setAttribute('fill','#60A5FA');
+  if(wandStar)wandStar.setAttribute('fill','#EC4899');
+  if(crownBase)crownBase.setAttribute('fill','#F59E0B');
+  const id=S.equippedItem;
+  if(!id)return;
+  if(id==='dress_pink')dressEl.setAttribute('fill','#EC4899');
+  if(id==='dress_purple')dressEl.setAttribute('fill','#9333EA');
+  if(id==='rainbow_dress'){
+    const defs=`<defs><linearGradient id="rdg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FF6B9D"/><stop offset="50%" stop-color="#60A5FA"/><stop offset="100%" stop-color="#86EFAC"/></linearGradient></defs>`;
+    accEl.innerHTML+=defs;dressEl.setAttribute('fill','url(#rdg)');
+  }
+  if(id==='necklace')neckEl.innerHTML='<ellipse cx="100" cy="165" rx="20" ry="5" fill="none" stroke="#D4AF37" stroke-width="3"/><circle cx="100" cy="170" r="4" fill="#FDE68A"/><circle cx="86" cy="167" r="3" fill="#FDE68A"/><circle cx="114" cy="167" r="3" fill="#FDE68A"/>';
+  if(id==='wings')wingsEl.innerHTML='<path d="M40 160 Q0 130 10 200 Q30 220 55 190 Z" fill="#C084FC" opacity=".7"/><path d="M160 160 Q200 130 190 200 Q170 220 145 190 Z" fill="#C084FC" opacity=".7"/>';
+  if(id==='wand_star'&&wandStar)wandStar.setAttribute('fill','#FDE68A');
+  if(id==='flower_crown')accEl.innerHTML+='<text x="62" y="38" font-size="22">🌸</text><text x="95" y="32" font-size="18">🌼</text><text x="124" y="38" font-size="18">🌸</text>';
+  if(id==='tiara')accEl.innerHTML+='<rect x="72" y="46" width="56" height="10" rx="5" fill="#B9F2FF"/><circle cx="100" cy="46" r="6" fill="#60A5FA"/><circle cx="80" cy="49" r="4" fill="#93C5FD"/><circle cx="120" cy="49" r="4" fill="#93C5FD"/>';
+  if(id==='crown_pink'){if(crownBase)crownBase.setAttribute('fill','#EC4899')}
+  if(id==='cape')accEl.innerHTML+='<path d="M50 175 Q30 230 35 280 Q70 295 100 295 Q130 295 165 280 Q170 230 150 175 Q130 195 100 198 Q70 195 50 175 Z" fill="#1E1B4B" opacity=".5"/><text x="82" y="240" font-size="20" opacity=".8">🌙</text>';
+  if(id==='shoes')accEl.innerHTML+='<ellipse cx="70" cy="290" rx="18" ry="8" fill="#EC4899"/><ellipse cx="130" cy="290" rx="18" ry="8" fill="#EC4899"/>';
+  if(id==='magic_bag')accEl.innerHTML+='<circle cx="28" cy="200" r="12" fill="#C084FC" stroke="#F59E0B" stroke-width="2"/><text x="22" y="205" font-size="12">✨</text>';
+  cloneOliviaTo('olivia-game');
+  cloneOliviaTo('olivia-result');
+}
+
+// ============================
+// CLONE OLIVIA
+// ============================
+function cloneOliviaTo(targetId){
+  const src=document.getElementById('olivia-main');
+  const tgt=document.getElementById(targetId);
+  if(!src||!tgt)return;
+  tgt.innerHTML=src.innerHTML;
+}
+
+// ============================
+// RANKING
+// ============================
+function showRanking(){
+  clearTimer();showScreen('screen-ranking');
+  const r=JSON.parse(localStorage.getItem('olivia_ranking')||'[]');
+  const list=document.getElementById('ranking-list');
+  list.innerHTML='';
+  const medals=['🥇','🥈','🥉'];
+  if(!r.length){list.innerHTML='<div style="color:rgba(255,255,255,.5);text-align:center;padding:20px">Seja a primeira! 👑</div>';return}
+  r.forEach((p,i)=>{
+    const item=document.createElement('div');
+    item.className='ranking-item';
+    if(p.name===S.playerName)item.style.borderColor='var(--gold)';
+    item.innerHTML=`<span class="rank-pos">${medals[i]||i+1+'.'}</span>
+      <span class="rank-name">${p.name}</span>
+      <span class="rank-level">Nv ${p.level||1}</span>
+      <span class="rank-score">⭐ ${p.score}</span>`;
+    list.appendChild(item);
+  });
+}
+
+// ============================
+// INIT
+// ============================
+createStars();
+// detect browser language
+(function(){
+  const bl=navigator.language||'pt';
+  if(bl.startsWith('en'))S.lang='en';
+  else if(bl.startsWith('fr'))S.lang='fr';
+  else S.lang='pt';
+  document.querySelectorAll('.lang-corner-btn').forEach(b=>b.classList.remove('active'));
+  const lb=document.getElementById('lang-'+S.lang);
+  if(lb)lb.classList.add('active');
+})();
+updateWelcomeText();
+window.addEventListener('load',()=>setTimeout(()=>{cloneOliviaTo('olivia-game');cloneOliviaTo('olivia-result')},300));
+</script>
+</body>
+</html>
