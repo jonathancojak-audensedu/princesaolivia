@@ -171,13 +171,14 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;overf
 .options-grid.opts-2{grid-template-columns:repeat(2,1fr)}
 .options-grid.opts-3{grid-template-columns:repeat(3,1fr)}
 .options-grid.opts-4{grid-template-columns:repeat(2,1fr)}
-.opt-card{background:var(--card);border:4px solid var(--border);border-radius:22px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
-.opt-card:hover:not(.disabled){border-color:var(--purple);background:rgba(192,132,252,.15);transform:scale(1.04)}
+.opt-card{background:var(--card);border:4px solid var(--border);border-radius:22px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:border-color .15s,transform .1s;position:relative;overflow:hidden;outline:none;-webkit-tap-highlight-color:transparent}
+.opt-card:active:not(.disabled){transform:scale(.95);border-color:rgba(255,255,255,.5)}
 .opt-emoji{font-size:clamp(2.2rem,7vw,3rem)}
+.opt-emoji-multi{font-size:clamp(1.4rem,4.5vw,2rem);line-height:1.5;text-align:center;letter-spacing:2px}
 .opt-word{font-family:'Fredoka One',cursive;color:white;font-size:clamp(.85rem,2.3vw,1.1rem);text-align:center;line-height:1.2}
 .opt-card.correct{border-color:var(--green);background:rgba(134,239,172,.22);animation:correctPulse .5s ease}
 .opt-card.wrong{border-color:var(--orange);background:rgba(252,165,165,.18);animation:wrongShake .4s ease}
-.opt-card.disabled{pointer-events:none}
+.opt-card.disabled{pointer-events:none;cursor:default}
 @keyframes correctPulse{0%{transform:scale(1)}50%{transform:scale(1.09)}100%{transform:scale(1)}}
 @keyframes wrongShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
 
@@ -198,10 +199,10 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;overf
 @keyframes scoreFloat{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-70px)}}
 
 /* COMBO EXPLOSION */
-.combo-explosion{position:fixed;inset:0;pointer-events:none;z-index:110;display:flex;align-items:center;justify-content:center;opacity:0}
+.combo-explosion{position:fixed;inset:0;pointer-events:none;z-index:90;display:flex;align-items:center;justify-content:center;opacity:0}
 .combo-explosion.show{animation:comboExplode .8s ease forwards}
 @keyframes comboExplode{0%{opacity:0;transform:scale(.5)}30%{opacity:1;transform:scale(1.1)}70%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.2)}}
-.combo-text{font-family:'Fredoka One',cursive;font-size:clamp(3rem,10vw,6rem);color:var(--gold);text-shadow:0 0 40px rgba(245,158,11,.8),0 4px 0 rgba(0,0,0,.3)}
+.combo-text{font-family:'Fredoka One',cursive;font-size:clamp(2rem,8vw,4rem);color:var(--gold);text-shadow:0 0 40px rgba(245,158,11,.8),0 4px 0 rgba(0,0,0,.3);text-align:center}
 
 /* MISSION COMPLETE POPUP */
 .mission-complete-popup{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,rgba(45,212,191,.9),rgba(134,239,172,.9));border:3px solid var(--green);border-radius:50px;padding:10px 22px;z-index:160;pointer-events:none;display:flex;align-items:center;gap:8px;opacity:0}
@@ -414,7 +415,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;overf
       <path d="M115 94 Q113 89 111 87" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
       <ellipse cx="100" cy="123" rx="5" ry="3" fill="#F5B9A0"/>
       <path d="M83 138 Q100 152 117 138" stroke="#E07B6A" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <path d="M88 141 Q100 150 112 141 Q112 147 100 148 Q88 147 88 141 Z" fill="white"/>
+      
       <path id="olivia-dress" d="M48 170 Q45 200 40 260 Q60 270 100 272 Q140 270 160 260 Q155 200 152 170 Q130 185 100 185 Q70 185 48 170 Z" fill="#60A5FA"/>
       <path d="M55 155 Q100 175 145 155 Q140 145 135 140 L130 165 Q100 178 70 165 L65 140 Q60 145 55 155 Z" fill="#3B82F6"/>
       <path d="M40 260 Q60 280 100 282 Q140 280 160 260 L152 240 Q130 255 100 257 Q70 255 48 240 Z" fill="#2563EB"/>
@@ -780,14 +781,14 @@ const PHASES = [
         {emoji:'🌹',word:{pt:'Flor Vermelha',en:'Red Flower',fr:'Fleur Rouge'},correct:true},
         {emoji:'🌻',word:{pt:'Flor Amarela',en:'Yellow Flower',fr:'Fleur Jaune'},correct:false},
         {emoji:'🌸',word:{pt:'Flor Rosa',en:'Pink Flower',fr:'Fleur Rose'},correct:false},
-        {emoji:'🪷',word:{pt:'Flor Roxa',en:'Purple Flower',fr:'Fleur Violette'},correct:false}
+        {emoji:'🌷',word:{pt:'Flor Roxa',en:'Purple Flower',fr:'Fleur Violette'},correct:false}
       ]},
      {word:{pt:'AMARELO',en:'YELLOW',fr:'JAUNE'},native:{pt:'',en:'Amarelo',fr:'Jaune'},
       question:{pt:'Qual flor é AMARELA?',en:'Which flower is YELLOW?',fr:'Quelle fleur est JAUNE?'},
       options:[
         {emoji:'🌺',word:{pt:'Flor Laranja',en:'Orange Flower',fr:'Fleur Orange'},correct:false},
         {emoji:'🌻',word:{pt:'Flor Amarela',en:'Yellow Flower',fr:'Fleur Jaune'},correct:true},
-        {emoji:'🪷',word:{pt:'Flor Roxa',en:'Purple Flower',fr:'Fleur Violette'},correct:false},
+        {emoji:'🌷',word:{pt:'Flor Roxa',en:'Purple Flower',fr:'Fleur Violette'},correct:false},
         {emoji:'🌹',word:{pt:'Flor Vermelha',en:'Red Flower',fr:'Fleur Rouge'},correct:false}
       ]},
      {word:{pt:'AZUL',en:'BLUE',fr:'BLEU'},native:{pt:'',en:'Azul',fr:'Bleu'},
@@ -795,7 +796,7 @@ const PHASES = [
       options:[
         {emoji:'🌹',word:{pt:'Flor Vermelha',en:'Red Flower',fr:'Fleur Rouge'},correct:false},
         {emoji:'🌻',word:{pt:'Flor Amarela',en:'Yellow Flower',fr:'Fleur Jaune'},correct:false},
-        {emoji:'🪻',word:{pt:'Flor Azul',en:'Blue Flower',fr:'Fleur Bleue'},correct:true},
+        {emoji:'💠',word:{pt:'Flor Azul',en:'Blue Flower',fr:'Fleur Bleue'},correct:true},
         {emoji:'🌸',word:{pt:'Flor Rosa',en:'Pink Flower',fr:'Fleur Rose'},correct:false}
       ]},
      {word:{pt:'ROSA',en:'PINK',fr:'ROSE'},native:{pt:'',en:'Rosa',fr:'Rose'},
@@ -803,7 +804,7 @@ const PHASES = [
       options:[
         {emoji:'🌸',word:{pt:'Flor Rosa',en:'Pink Flower',fr:'Fleur Rose'},correct:true},
         {emoji:'🌿',word:{pt:'Folha Verde',en:'Green Leaf',fr:'Feuille Verte'},correct:false},
-        {emoji:'🪻',word:{pt:'Flor Azul',en:'Blue Flower',fr:'Fleur Bleue'},correct:false},
+        {emoji:'💠',word:{pt:'Flor Azul',en:'Blue Flower',fr:'Fleur Bleue'},correct:false},
         {emoji:'🌻',word:{pt:'Flor Amarela',en:'Yellow Flower',fr:'Fleur Jaune'},correct:false}
       ]},
      {word:{pt:'ROXO',en:'PURPLE',fr:'VIOLET'},native:{pt:'',en:'Roxo',fr:'Violet'},
@@ -812,7 +813,7 @@ const PHASES = [
         {emoji:'🌹',word:{pt:'Flor Vermelha',en:'Red Flower',fr:'Fleur Rouge'},correct:false},
         {emoji:'🌸',word:{pt:'Flor Rosa',en:'Pink Flower',fr:'Fleur Rose'},correct:false},
         {emoji:'🌻',word:{pt:'Flor Amarela',en:'Yellow Flower',fr:'Fleur Jaune'},correct:false},
-        {emoji:'🪷',word:{pt:'Flor Roxa',en:'Purple Flower',fr:'Fleur Violette'},correct:true}
+        {emoji:'🌷',word:{pt:'Flor Roxa',en:'Purple Flower',fr:'Fleur Violette'},correct:true}
       ]}
    ]},
   {id:3,emoji:'🏚',colors:['#34D399','#60A5FA'],
@@ -949,7 +950,7 @@ const PHASES = [
         {emoji:'🌹',word:{pt:'Flor Vermelha',en:'Red Flower',fr:'Fleur Rouge'},correct:false},
         {emoji:'🌻',word:{pt:'Flor Amarela',en:'Yellow Flower',fr:'Fleur Jaune'},correct:false},
         {emoji:'🌿',word:{pt:'Flor Verde',en:'Green Flower',fr:'Fleur Verte'},correct:true},
-        {emoji:'🪻',word:{pt:'Flor Azul',en:'Blue Flower',fr:'Fleur Bleue'},correct:false}
+        {emoji:'💠',word:{pt:'Flor Azul',en:'Blue Flower',fr:'Fleur Bleue'},correct:false}
       ]},
      {word:{pt:'CAVALO',en:'HORSE',fr:'CHEVAL'},native:{pt:'',en:'Cavalo',fr:'Cheval'},
       question:{pt:'Encontre o CAVALO da fazenda!',en:'Find the farm HORSE!',fr:'Trouve le CHEVAL de la ferme!'},
@@ -964,7 +965,7 @@ const PHASES = [
       options:[
         {emoji:'⭕',word:{pt:'Círculo',en:'Circle',fr:'Cercle'},correct:false},
         {emoji:'🔺',word:{pt:'Triângulo',en:'Triangle',fr:'Triangle'},correct:true},
-        {emoji:'▬',word:{pt:'Retângulo',en:'Rectangle',fr:'Rectangle'},correct:false},
+        {emoji:'🔷',word:{pt:'Retângulo',en:'Rectangle',fr:'Rectangle'},correct:false},
         {emoji:'⭐',word:{pt:'Estrela',en:'Star',fr:'Étoile'},correct:false}
       ]}
    ]}
@@ -1326,6 +1327,11 @@ function getOptCount(){
 }
 
 function renderQuestion(){
+  // Reset all option cards to clean state
+  document.querySelectorAll('.opt-card').forEach(c=>{
+    c.classList.remove('correct','wrong','disabled');
+    c.removeAttribute('style');
+  });
   const ph=PHASES[S.currentPhase];
   const q=ph.questions[S.currentQuestion];
   const total=ph.questions.length;
@@ -1363,8 +1369,21 @@ function renderQuestion(){
   grid.innerHTML='';
   chosen.forEach(opt=>{
     const c=document.createElement('div');
-    c.className='opt-card';
-    c.innerHTML=`<span class="opt-emoji">${opt.emoji}</span><span class="opt-word">${opt.word[S.lang]}</span>`;
+    c.className='opt-card';c.removeAttribute('style');
+    // Split multi-emoji into spaced spans for better readability
+    const emojis=[...opt.emoji];
+    let emojiHtml='';
+    if(emojis.length>1){
+      const rows=[];
+      const half=Math.ceil(emojis.length/2);
+      for(let i=0;i<emojis.length;i+=half){
+        rows.push(emojis.slice(i,i+half).join(' '));
+      }
+      emojiHtml=`<div class="opt-emoji-multi">${rows.map(r=>`<div>${r}</div>`).join('')}</div>`;
+    } else {
+      emojiHtml=`<span class="opt-emoji">${opt.emoji}</span>`;
+    }
+    c.innerHTML=emojiHtml+`<span class="opt-word">${opt.word[S.lang]}</span>`;
     c.onclick=()=>handleAnswer(opt.correct,c,q);
     grid.appendChild(c);
   });
@@ -1443,14 +1462,14 @@ function handleAnswer(correct,card,q){
 
     if(S.combo>=2){
       sndCombo(S.combo);
-      setTimeout(()=>showComboExplosion(S.combo),300);
+      setTimeout(()=>showComboExplosion(S.combo),600);
       // random chest threshold
       if(S.combo>=S.chestThreshold){
         resetChestThreshold();
         setTimeout(()=>showChest(),1500);
       }
     }
-    speak(q?q.word[S.lang]+'! '+msg:msg);
+    speak(q?q.question[S.lang]+' '+msg:msg);
     updateMissionProg();
   } else {
     if(card)card.classList.add('wrong');
@@ -1560,7 +1579,7 @@ function hideFeedback(){document.getElementById('feedback-overlay').classList.re
 
 function showScorePopup(txt){
   const el=document.createElement('div');el.className='score-popup';el.textContent=txt;
-  el.style.cssText=`left:${35+Math.random()*30}%;top:35%;`;
+  el.style.cssText=`left:${30+Math.random()*40}%;top:20%;`;
   document.body.appendChild(el);setTimeout(()=>el.remove(),1200);
 }
 
