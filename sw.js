@@ -1,6 +1,6 @@
 // Suba a VERSION toda vez que editar qualquer arquivo, senão o celular
 // continua servindo a versão antiga do cache.
-const VERSION = 'reino-v3.1.1';
+const VERSION = 'reino-v3.2.0';
 
 const ARQUIVOS = [
   './',
@@ -11,6 +11,7 @@ const ARQUIVOS = [
   './js/config.js',
   './js/estado.js',
   './js/audio.js',
+  './js/cenario.js',
   './js/festa.js',
   './js/icones.js',
   './js/unicornio.js',

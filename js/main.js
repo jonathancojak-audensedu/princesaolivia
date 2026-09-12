@@ -2,6 +2,7 @@ import { MUNDOS, FASES, UNICORNIOS, ELOGIOS, MODO_PERDER, VIDAS } from './config
 import { estado } from './estado.js';
 import { som, falar, repetirFala, calar, desbloquear } from './audio.js';
 import { festa, faisca } from './festa.js';
+import { cenario } from './cenario.js';
 import { unicornio, corPorNome } from './unicornio.js';
 import { icone } from './icones.js';
 import { sorteio, tremer } from './util.js';
@@ -30,21 +31,8 @@ function pintarCeu(mundo) {
   const [a, b] = mundo ? mundo.ceu : ['#5B3E8C', '#2E2350'];
   document.body.style.setProperty('--ceu-a', a);
   document.body.style.setProperty('--ceu-b', b);
+  cenario(mundo ? mundo.id : null);
 }
-
-/* ---------------- céu estrelado ---------------- */
-(function estrelas() {
-  const ceu = $('#ceu');
-  const frag = document.createDocumentFragment();
-  for (let i = 0; i < 46; i++) {
-    const s = document.createElement('div');
-    s.className = 'estrelinha';
-    const t = (1 + Math.random() * 2.6).toFixed(1);
-    s.style.cssText = `width:${t}px;height:${t}px;left:${Math.random() * 100}%;top:${Math.random() * 72}%;animation-delay:${(Math.random() * 3).toFixed(1)}s`;
-    frag.appendChild(s);
-  }
-  ceu.appendChild(frag);
-})();
 
 /* ---------------- tela: mundos ---------------- */
 function telaMundos() {

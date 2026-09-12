@@ -27,8 +27,6 @@ em{font-style:normal}
 .na-linha{display:inline-block;width:1.1em;vertical-align:-.2em;margin-right:.3em}
 
 #ceu{position:fixed;inset:0;pointer-events:none;z-index:0}
-.estrelinha{position:absolute;background:#fff;border-radius:50%;animation:pisca 3s ease-in-out infinite}
-@keyframes pisca{0%,100%{opacity:.15;transform:scale(.7)}50%{opacity:.85;transform:scale(1)}}
 
 #app{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;min-height:0}
 .tela{flex:1;display:flex;flex-direction:column;min-height:0;padding:14px 18px 20px;gap:14px}
