@@ -26,14 +26,14 @@
     <h1 id="titulo"><b>Reino Encantado</b><i>escolha um lugar</i></h1>
     <div id="lista-mundos"></div>
     <button id="btn-estabulo" class="barra-baixo">
-      <em>🦄</em><span>Meus unicórnios</span><small id="contador-colecao"></small>
+      <em aria-hidden="true"></em><span>Meus unicórnios</span><small id="contador-colecao"></small>
     </button>
   </section>
 
   <!-- ============ FASES ============ -->
   <section id="tela-fases" class="tela" hidden>
     <header class="topo">
-      <button id="voltar-fases" class="circ" aria-label="Voltar">←</button>
+      <button id="voltar-fases" class="circ" aria-label="Voltar" data-icone="seta"></button>
       <h2 id="nome-mundo"></h2>
       <span class="circ vazio" aria-hidden="true"></span>
     </header>
@@ -43,12 +43,12 @@
   <!-- ============ JOGO ============ -->
   <section id="tela-jogo" class="tela" hidden>
     <header class="topo">
-      <button id="sair-jogo" class="circ" aria-label="Sair da fase">←</button>
+      <button id="sair-jogo" class="circ" aria-label="Sair da fase" data-icone="seta"></button>
       <div class="topo-centro">
         <h2 id="titulo-fase"></h2>
         <div id="pontos-rodada" class="pontos"></div>
       </div>
-      <button id="repetir" class="circ" aria-label="Ouvir de novo">🔊</button>
+      <button id="repetir" class="circ" aria-label="Ouvir de novo" data-icone="som"></button>
     </header>
     <div id="coracoes" class="coracoes" hidden></div>
     <div id="ampulheta"><div id="areia"></div></div>
@@ -68,7 +68,7 @@
   <!-- ============ ESTÁBULO ============ -->
   <section id="tela-estabulo" class="tela" hidden>
     <header class="topo">
-      <button id="voltar-estabulo" class="circ" aria-label="Voltar">←</button>
+      <button id="voltar-estabulo" class="circ" aria-label="Voltar" data-icone="seta"></button>
       <h2>Meus unicórnios</h2>
       <span class="circ vazio" aria-hidden="true"></span>
     </header>

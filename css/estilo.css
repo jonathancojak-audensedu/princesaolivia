@@ -20,6 +20,11 @@ body{
   padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 h1,h2,p{margin:0}
+em{font-style:normal}
+
+/* Ícones SVG ocupam a largura do contêiner; quem dimensiona é o pai. */
+.icone{width:100%;height:auto;display:block}
+.na-linha{display:inline-block;width:1.1em;vertical-align:-.2em;margin-right:.3em}
 
 #ceu{position:fixed;inset:0;pointer-events:none;z-index:0}
 .estrelinha{position:absolute;background:#fff;border-radius:50%;animation:pisca 3s ease-in-out infinite}
@@ -35,7 +40,7 @@ h1,h2,p{margin:0}
 .topo-centro{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px}
 .circ{
   width:54px;height:54px;flex:0 0 54px;border:none;border-radius:50%;
-  background:rgba(255,255,255,.14);color:var(--creme);font-size:24px;line-height:1;
+  background:rgba(255,255,255,.14);color:var(--creme);padding:14px;
   cursor:pointer;display:grid;place-items:center;transition:transform .15s ease,background .15s ease;
 }
 .circ:active{transform:scale(.9);background:rgba(255,255,255,.28)}
@@ -43,9 +48,11 @@ h1,h2,p{margin:0}
 button:focus-visible{outline:4px solid var(--ouro);outline-offset:3px}
 
 .pontos{display:flex;gap:7px}
-.pontos span{font-size:20px;filter:grayscale(1) brightness(1.7);opacity:.35;transition:all .3s cubic-bezier(.34,1.56,.64,1)}
+.pontos span{width:20px;filter:grayscale(1) brightness(1.7);opacity:.35;transition:all .3s cubic-bezier(.34,1.56,.64,1)}
 .pontos span.on{filter:none;opacity:1;transform:scale(1.25) rotate(-8deg)}
-.coracoes{display:flex;gap:8px;justify-content:center;font-size:22px}
+.coracoes{display:flex;gap:8px;justify-content:center}
+.coracoes span{width:24px}
+.coracoes span.perdido{filter:grayscale(1) brightness(1.7);opacity:.35}
 
 .botao-grande{
   border:none;border-radius:26px;padding:16px 40px;cursor:pointer;font-family:inherit;
@@ -71,7 +78,7 @@ button:focus-visible{outline:4px solid var(--ouro);outline-offset:3px}
   color:var(--creme);font-family:inherit;text-align:left;transition:transform .12s ease;
 }
 .cartao-mundo:active{transform:translateY(5px);box-shadow:inset 0 0 0 2px rgba(255,255,255,.18),0 4px 0 rgba(0,0,0,.22)}
-.cartao-mundo em{grid-row:1/3;font-size:clamp(38px,10vw,54px);font-style:normal;line-height:1}
+.cartao-mundo em{grid-row:1/3;width:clamp(38px,10vw,54px)}
 .cartao-mundo span{font-size:clamp(20px,5.2vw,27px);font-weight:600}
 .cartao-mundo small{font-size:13px;color:var(--lilas)}
 .cartao-mundo.travado{opacity:.5;box-shadow:inset 0 0 0 2px rgba(255,255,255,.1),0 9px 0 rgba(0,0,0,.18)}
@@ -80,7 +87,8 @@ button:focus-visible{outline:4px solid var(--ouro);outline-offset:3px}
   display:flex;align-items:center;gap:14px;border:none;border-radius:24px;padding:14px 22px;
   background:rgba(255,255,255,.1);color:var(--creme);font-family:inherit;cursor:pointer;
 }
-.barra-baixo em{font-size:30px;font-style:normal}
+.barra-baixo em{width:34px;flex:0 0 34px}
+.barra-baixo em svg{width:100%;height:auto;display:block}
 .barra-baixo span{flex:1;text-align:left;font-size:18px;font-weight:600}
 .barra-baixo small{font-size:16px;color:var(--ouro);font-weight:600}
 .barra-baixo:active{background:rgba(255,255,255,.2)}
@@ -98,7 +106,7 @@ button:focus-visible{outline:4px solid var(--ouro);outline-offset:3px}
   background:rgba(0,0,0,.25);font-size:22px;font-weight:700;
 }
 .cartao-fase span{flex:1;text-align:left;font-size:clamp(18px,4.6vw,23px);font-weight:600}
-.cartao-fase em{font-size:24px;font-style:normal}
+.cartao-fase em{width:26px;flex:0 0 26px}
 .cartao-fase.feita b{background:var(--ouro);color:var(--noite)}
 .cartao-fase.travado{opacity:.45}
 
@@ -128,7 +136,7 @@ button:focus-visible{outline:4px solid var(--ouro);outline-offset:3px}
 @keyframes apaga{to{opacity:0;transform:scale(.5)}}
 
 #contagem{display:flex;flex-wrap:wrap;gap:clamp(5px,1.8vw,14px);justify-content:center;max-width:560px}
-#contagem i{font-size:clamp(30px,9vw,54px);font-style:normal;animation:flutua 2.4s ease-in-out infinite}
+#contagem i{width:clamp(30px,9vw,54px);animation:flutua 2.4s ease-in-out infinite}
 @keyframes flutua{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
 .num{
   flex:1 1 0;max-width:140px;min-width:82px;border:none;cursor:pointer;border-radius:24px;
@@ -142,14 +150,17 @@ button:focus-visible{outline:4px solid var(--ouro);outline-offset:3px}
 
 #memoria{display:grid;gap:clamp(8px,2.4vw,15px);width:100%;max-width:520px}
 .carta{
-  aspect-ratio:1;border:none;cursor:pointer;border-radius:20px;font-size:clamp(30px,9vw,54px);
+  aspect-ratio:1;border:none;cursor:pointer;border-radius:20px;padding:18%;
   background:linear-gradient(150deg,var(--lilas),#8A5BD1);
-  box-shadow:0 8px 0 rgba(0,0,0,.3);color:transparent;display:grid;place-items:center;
+  box-shadow:0 8px 0 rgba(0,0,0,.3);display:block;
   transition:background .2s ease,transform .2s ease;
 }
-.carta::after{content:'✧';color:rgba(255,255,255,.55);font-size:clamp(24px,6vw,38px)}
-.carta.aberta,.carta.feita{background:var(--creme);color:initial}
-.carta.aberta::after,.carta.feita::after{content:''}
+/* Bloco, não grid: largura em % resolve direto contra a carta. */
+.carta .verso{display:block;padding:16%;opacity:.4}
+.carta .frente{display:none}
+.carta.aberta,.carta.feita{background:var(--creme)}
+.carta.aberta .verso,.carta.feita .verso{display:none}
+.carta.aberta .frente,.carta.feita .frente{display:block}
 .carta.feita{box-shadow:0 0 0 4px var(--menta),0 8px 0 rgba(0,0,0,.2)}
 
 #pergunta{text-align:center;font-size:clamp(18px,4.8vw,25px);font-weight:600;min-height:1.6em}

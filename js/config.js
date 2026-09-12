@@ -18,27 +18,25 @@ export const CORES = [
   { nome: 'branco',   pelo: '#F4EEF9', crina: '#B0A2C4' }
 ];
 
-/** Pares do jogo da memória. Só figuras que uma criança de 4 anos reconhece. */
-export const FIGURAS = ['🦄', '👑', '⭐', '💖', '🌈', '🏰', '🧁', '🦋'];
-
 /** Recompensa de cada fase: um unicórnio novo para o estábulo.
- *  A ordem importa — é a ordem em que ela vai colecionar. */
+ *  A ordem importa — é a ordem em que ela vai colecionar.
+ *  `acessorio` é o nome de um ícone de js/icones.js. */
 export const UNICORNIOS = [
-  { id: 'luna',     nome: 'Luna',     cor: 'rosa',     acessorio: '👑' },
-  { id: 'ceu',      nome: 'Céu',      cor: 'azul',     acessorio: '🎀' },
-  { id: 'mel',      nome: 'Mel',      cor: 'amarelo',  acessorio: '🌻' },
-  { id: 'trevo',    nome: 'Trevo',    cor: 'verde',    acessorio: '🍀' },
-  { id: 'amora',    nome: 'Amora',    cor: 'roxo',     acessorio: '🫐' },
-  { id: 'pipoca',   nome: 'Pipoca',   cor: 'laranja',  acessorio: '🧡' },
-  { id: 'cereja',   nome: 'Cereja',   cor: 'vermelho', acessorio: '🍒' },
-  { id: 'neve',     nome: 'Neve',     cor: 'branco',   acessorio: '❄️' },
-  { id: 'bala',     nome: 'Bala',     cor: 'rosa',     acessorio: '🍭' },
-  { id: 'onda',     nome: 'Onda',     cor: 'azul',     acessorio: '🐚' },
-  { id: 'sol',      nome: 'Sol',      cor: 'amarelo',  acessorio: '☀️' },
-  { id: 'folha',    nome: 'Folha',    cor: 'verde',    acessorio: '🌿' },
-  { id: 'estrela',  nome: 'Estrela',  cor: 'roxo',     acessorio: '✨' },
-  { id: 'mexerica', nome: 'Mexerica', cor: 'laranja',  acessorio: '🍊' },
-  { id: 'rubi',     nome: 'Rubi',     cor: 'vermelho', acessorio: '💎' }
+  { id: 'luna',     nome: 'Luna',     cor: 'rosa',     acessorio: 'lua' },
+  { id: 'ceu',      nome: 'Céu',      cor: 'azul',     acessorio: 'nuvem' },
+  { id: 'mel',      nome: 'Mel',      cor: 'amarelo',  acessorio: 'flor' },
+  { id: 'trevo',    nome: 'Trevo',    cor: 'verde',    acessorio: 'arvore' },
+  { id: 'amora',    nome: 'Amora',    cor: 'roxo',     acessorio: 'borboleta' },
+  { id: 'pipoca',   nome: 'Pipoca',   cor: 'laranja',  acessorio: 'bolo' },
+  { id: 'cereja',   nome: 'Cereja',   cor: 'vermelho', acessorio: 'coracao' },
+  { id: 'neve',     nome: 'Neve',     cor: 'branco',   acessorio: 'estrela' },
+  { id: 'bala',     nome: 'Bala',     cor: 'rosa',     acessorio: 'arcoiris' },
+  { id: 'onda',     nome: 'Onda',     cor: 'azul',     acessorio: 'peixe' },
+  { id: 'sol',      nome: 'Sol',      cor: 'amarelo',  acessorio: 'coroa' },
+  { id: 'folha',    nome: 'Folha',    cor: 'verde',    acessorio: 'flor' },
+  { id: 'estrela',  nome: 'Estrela',  cor: 'roxo',     acessorio: 'estrela' },
+  { id: 'mexerica', nome: 'Mexerica', cor: 'laranja',  acessorio: 'flor' },
+  { id: 'rubi',     nome: 'Rubi',     cor: 'vermelho', acessorio: 'coroa' }
 ];
 
 /** 3 mundos x 5 fases. `nivel` é o que cada minijogo lê para se ajustar. */
@@ -46,21 +44,21 @@ export const MUNDOS = [
   {
     id: 1,
     nome: 'Castelo',
-    emoji: '🏰',
+    icone: 'castelo',
     ceu: ['#5B3E8C', '#2E2350'],
     nivel: { opcoes: 3, maxNumero: 3, pares: 2, coresParecidas: false, segundos: 14 }
   },
   {
     id: 2,
     nome: 'Floresta',
-    emoji: '🌳',
+    icone: 'arvore',
     ceu: ['#2F6B52', '#15342A'],
     nivel: { opcoes: 4, maxNumero: 5, pares: 3, coresParecidas: false, segundos: 12 }
   },
   {
     id: 3,
     nome: 'Nuvens',
-    emoji: '☁️',
+    icone: 'nuvem',
     ceu: ['#3E63A8', '#1B2A52'],
     nivel: { opcoes: 5, maxNumero: 10, pares: 4, coresParecidas: true, segundos: 10 }
   }

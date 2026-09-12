@@ -3,6 +3,7 @@ import { estado } from './estado.js';
 import { som, falar, repetirFala, calar, desbloquear } from './audio.js';
 import { festa, faisca } from './festa.js';
 import { unicornio, corPorNome } from './unicornio.js';
+import { icone } from './icones.js';
 import { sorteio, tremer } from './util.js';
 import { rodada as rodadaCores } from './jogos/cores.js';
 import { rodada as rodadaContar } from './jogos/contar.js';
@@ -54,7 +55,7 @@ function telaMundos() {
     const aberto = estado.mundoLiberado(m.id);
     const feitas = FASES.filter((_, i) => estado.concluida(m.id, i + 1)).length;
     return `<button class="cartao-mundo ${aberto ? '' : 'travado'}" data-mundo="${m.id}" ${aberto ? '' : 'aria-disabled="true"'}>
-      <em>${aberto ? m.emoji : '🔒'}</em>
+      <em>${icone(aberto ? m.icone : 'cadeado')}</em>
       <span>${m.nome}</span>
       <small>${aberto ? `${feitas} de ${FASES.length}` : 'Termine o mundo anterior'}</small>
     </button>`;
@@ -77,13 +78,13 @@ function telaMundos() {
 function telaFases(idMundo) {
   const mundo = MUNDOS.find(m => m.id === idMundo);
   pintarCeu(mundo);
-  $('#nome-mundo').textContent = `${mundo.emoji} ${mundo.nome}`;
+  $('#nome-mundo').innerHTML = `<em class="na-linha">${icone(mundo.icone)}</em>${mundo.nome}`;
 
   $('#lista-fases').innerHTML = FASES.map((f, i) => {
     const n = i + 1;
     const feita = estado.concluida(idMundo, n);
     const aberta = estado.liberada(idMundo, n);
-    const selo = feita ? '⭐' : aberta ? '▶' : '🔒';
+    const selo = icone(feita ? 'estrela' : aberta ? 'tocar' : 'cadeado');
     return `<button class="cartao-fase ${aberta ? '' : 'travado'} ${feita ? 'feita' : ''}" data-fase="${n}">
       <b>${n}</b><span>${f.nome}</span><em>${selo}</em>
     </button>`;
@@ -148,7 +149,7 @@ function iniciarFase(idMundo, numFase) {
     indice: 0, dourada: true, vidas: VIDAS
   });
   pintarCeu(mundo);
-  $('#titulo-fase').textContent = `${mundo.emoji} Fase ${numFase} · ${FASES[numFase - 1].nome}`;
+  $('#titulo-fase').innerHTML = `<em class="na-linha">${icone(mundo.icone)}</em>Fase ${numFase} · ${FASES[numFase - 1].nome}`;
   $('#coracoes').hidden = !MODO_PERDER;
   mostrar('jogo');
   desenharRodadas();
@@ -158,13 +159,13 @@ function iniciarFase(idMundo, numFase) {
 
 function desenharRodadas() {
   $('#pontos-rodada').innerHTML = partida.roteiro
-    .map((_, i) => `<span class="${i < partida.indice ? 'on' : ''}">⭐</span>`).join('');
+    .map((_, i) => `<span class="${i < partida.indice ? 'on' : ''}">${icone('estrela')}</span>`).join('');
 }
 
 function desenharCoracoes() {
   if (!MODO_PERDER) return;
   $('#coracoes').innerHTML = Array.from({ length: VIDAS },
-    (_, i) => `<span>${i < partida.vidas ? '❤️' : '🤍'}</span>`).join('');
+    (_, i) => `<span class="${i < partida.vidas ? '' : 'perdido'}">${icone('coracao')}</span>`).join('');
 }
 
 function rodar() {
@@ -244,10 +245,10 @@ function fimDeFase() {
   } else {
     $('#premio-titulo').textContent = jaTinha ? 'Muito bem de novo!' : 'Fase completa!';
     $('#premio-desenho').innerHTML = unicornio(corPorNome(premio.cor), premio.acessorio);
-    $('#premio-nome').textContent = partida.dourada ? '⭐ Estrela dourada' : '⭐ Fase completa';
+    $('#premio-nome').innerHTML = `<em class="na-linha">${icone('estrela')}</em>${partida.dourada ? 'Estrela dourada' : 'Fase completa'}`;
   }
 
-  $('#premio-selo').textContent = partida.dourada ? '⭐ dourada' : '⭐ prateada';
+  $('#premio-selo').innerHTML = `<em class="na-linha">${icone('estrela')}</em>${partida.dourada ? 'dourada' : 'prateada'}`;
   mostrar('premio');
 }
 
@@ -265,6 +266,9 @@ function telaEstabulo() {
 }
 
 /* ---------------- ligações ---------------- */
+document.querySelectorAll('[data-icone]').forEach(el => el.innerHTML = icone(el.dataset.icone));
+$('#btn-estabulo em').innerHTML = unicornio(corPorNome('rosa'));
+
 $('#btn-estabulo').addEventListener('click', () => { desbloquear(); som.toque(); telaEstabulo(); });
 $('#voltar-fases').addEventListener('click', () => { som.toque(); telaMundos(); });
 $('#voltar-estabulo').addEventListener('click', () => { som.toque(); telaMundos(); });

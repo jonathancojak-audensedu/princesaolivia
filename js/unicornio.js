@@ -1,10 +1,14 @@
 import { CORES } from './config.js';
+import { icone } from './icones.js';
 
 export const corPorNome = nome => CORES.find(c => c.nome === nome) || CORES[0];
 
+/** Só o desenho de dentro do ícone: um <svg class="icone"> aninhado herdaria width:100%. */
+const miolo = svg => svg.replace(/^<svg[^>]*>|<\/svg>$/g, '');
+
 /**
  * @param {object}  cor       objeto de CORES
- * @param {string}  acessorio emoji opcional ao lado da orelha
+ * @param {string}  acessorio nome de um ícone de icones.js, desenhado ao lado da orelha
  * @param {boolean} silhueta  desenha só a sombra (unicórnio ainda não conquistado)
  */
 export function unicornio(cor, acessorio = '', silhueta = false) {
@@ -28,6 +32,6 @@ export function unicornio(cor, acessorio = '', silhueta = false) {
   ${silhueta ? '' : '<circle cx="59.2" cy="73.6" r="2.2" fill="#fff"/><circle cx="85.2" cy="73.6" r="2.2" fill="#fff"/>'}
   <path d="M60 99q10 11 20 0" stroke="${crina}" stroke-width="4" stroke-linecap="round" fill="none"/>
   ${silhueta ? '' : '<ellipse cx="45" cy="92" rx="7" ry="5" fill="#FF6F9C" opacity=".45"/><ellipse cx="95" cy="92" rx="7" ry="5" fill="#FF6F9C" opacity=".45"/>'}
-  ${acessorio && !silhueta ? `<text x="108" y="36" font-size="30" text-anchor="middle">${acessorio}</text>` : ''}
+  ${acessorio && !silhueta ? `<g transform="translate(92 6) scale(.32)">${miolo(icone(acessorio))}</g>` : ''}
 </svg>`;
 }

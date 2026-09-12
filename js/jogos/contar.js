@@ -1,4 +1,5 @@
 import { embaralhar, inteiro } from '../util.js';
+import { icone } from '../icones.js';
 
 export function rodada(palco, nivel, api) {
   const max = nivel.maxNumero;
@@ -9,7 +10,7 @@ export function rodada(palco, nivel, api) {
   const lista = embaralhar([...opcoes]);
 
   const estrelas = Array.from({ length: certo }, (_, i) =>
-    `<i style="animation-delay:${(i * 0.18).toFixed(2)}s">⭐</i>`).join('');
+    `<i style="animation-delay:${(i * 0.18).toFixed(2)}s">${icone('estrela')}</i>`).join('');
 
   // Acima de 5, mostra só o algarismo: bolinha demais vira poluição visual.
   const bolinhas = n => n <= 5 ? `<u>${'<s></s>'.repeat(n)}</u>` : '';

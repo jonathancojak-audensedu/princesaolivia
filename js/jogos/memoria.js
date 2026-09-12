@@ -1,15 +1,18 @@
-import { FIGURAS } from '../config.js';
+import { FIGURAS_MEMORIA, icone } from '../icones.js';
 import { embaralhar } from '../util.js';
 import { som } from '../audio.js';
 
 export function rodada(palco, nivel, api) {
   const pares = nivel.pares;
-  const figuras = embaralhar(FIGURAS).slice(0, pares);
+  const figuras = embaralhar(FIGURAS_MEMORIA).slice(0, pares);
   const cartas = embaralhar([...figuras, ...figuras]);
   const colunas = pares <= 2 ? 2 : pares === 3 ? 3 : 4;
 
   palco.innerHTML = `<div id="memoria" style="grid-template-columns:repeat(${colunas},1fr)">${
-    cartas.map(f => `<button class="carta" data-f="${f}">${f}</button>`).join('')
+    cartas.map(f => `<button class="carta" data-f="${f}">
+      <span class="verso" aria-hidden="true">${icone('estrela')}</span>
+      <span class="frente">${icone(f)}</span>
+    </button>`).join('')
   }</div>`;
 
   api.pergunta('Ache os pares iguais');
