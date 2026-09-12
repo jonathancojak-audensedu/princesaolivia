@@ -1,0 +1,14 @@
+{
+  "name": "reino-encantado",
+  "version": "3.0.0",
+  "description": "Jogo de cores, números e memória para crianças de 3 a 5 anos. HTML, CSS e JS puro, sem build.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npx --yes serve . -l 8080",
+    "test": "node tests/smoke.mjs"
+  },
+  "devDependencies": {
+    "jsdom": "^26.0.0"
+  }
+}

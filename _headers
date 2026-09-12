@@ -1,0 +1,8 @@
+# Cloudflare Pages: o service worker e o HTML nunca podem ficar presos no cache
+# do CDN, senão a atualização do jogo não chega no celular.
+/sw.js
+  Cache-Control: no-cache
+/index.html
+  Cache-Control: no-cache
+/manifest.webmanifest
+  Cache-Control: no-cache
