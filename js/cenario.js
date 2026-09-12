@@ -10,7 +10,7 @@
 const ESTILO = `<style>
   .cena * { transform-box: fill-box; }
   @keyframes cintila { 0%,100%{opacity:.12} 50%{opacity:.55} }
-  @keyframes flutua  { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
+  @keyframes flutua-lua { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
   @keyframes desliza { from{transform:translateX(-140px)} to{transform:translateX(940px)} }
   @keyframes balanca { 0%,100%{transform:rotate(-1.2deg)} 50%{transform:rotate(1.2deg)} }
   @keyframes vagalume{ 0%,100%{opacity:0;transform:translate(0,0)}
@@ -19,9 +19,12 @@ const ESTILO = `<style>
   .nuvem    { animation: desliza linear infinite }
   .copa     { animation: balanca 7s ease-in-out infinite; transform-origin: 50% 100% }
   .lume     { animation: vagalume 6s ease-in-out infinite }
-  .lua      { animation: flutua 14s ease-in-out infinite }
+  .lua      { animation: flutua-lua 14s ease-in-out infinite }
   @media (prefers-reduced-motion: reduce) { .cena * { animation: none !important } }
 </style>`;
+
+// Último mundo desenhado. Começa undefined para que o primeiro null (menu) também desenhe.
+let ultimo;
 
 const aleatorio = (min, max) => min + Math.random() * (max - min);
 
@@ -89,10 +92,12 @@ const CENAS = {
 /**
  * Troca o cenário de fundo. Chame junto com `pintarCeu()` ao mudar de mundo.
  * @param {number|null} idMundo 1, 2 ou 3. `null` volta ao céu neutro do menu.
+ * Mesmo mundo de antes não redesenha: evita recriar o SVG e o fundo saltar a cada tela.
  */
 export function cenario(idMundo) {
   const alvo = document.getElementById('ceu');
-  if (!alvo) return;
+  if (!alvo || idMundo === ultimo) return;
+  ultimo = idMundo;
   const desenhar = CENAS[idMundo] || CENAS[1];
   alvo.innerHTML = `<svg class="cena" viewBox="0 0 800 600" preserveAspectRatio="xMidYMax slice"
     width="100%" height="100%" aria-hidden="true">${ESTILO}${desenhar()}</svg>`;
