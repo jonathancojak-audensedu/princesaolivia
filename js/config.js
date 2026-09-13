@@ -18,9 +18,8 @@ export const CORES = [
   { nome: 'branco',   pelo: '#F4EEF9', crina: '#B0A2C4' }
 ];
 
-/** Unicórnios. Não são mais prêmio de fase (a fase entrega roupa, ver roupas.js):
- *  aparecem como companhia na cena de cada ocasião. A lista inteira fica porque
- *  quem jogou a versão 1 tem esses ids salvos.
+/** Unicórnios. Não são mais prêmio de fase (a fase entrega roupa, ver roupas.js).
+ *  Ficam todos no estábulo, e ela escolhe qual vai junto nas ocasiões.
  *  `acessorio` é o nome de um ícone de js/icones.js. */
 export const UNICORNIOS = [
   { id: 'luna',     nome: 'Luna',     cor: 'rosa',     acessorio: 'lua' },
@@ -41,7 +40,8 @@ export const UNICORNIOS = [
 ];
 
 /** 3 mundos x 5 fases. `nivel` é o que cada minijogo lê para se ajustar.
- *  `ocasiao` abre quando o mundo fecha 5/5. Só sugere um passeio: não exige roupa nenhuma. */
+ *  `ocasiao` abre quando o mundo fecha 5/5. Só sugere um passeio: não exige roupa nenhuma.
+ *  `ocasiao.unicornio` é quem vai junto enquanto ela não escolher um no estábulo. */
 export const MUNDOS = [
   {
     id: 1,

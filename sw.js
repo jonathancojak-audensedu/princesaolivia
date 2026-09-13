@@ -1,6 +1,6 @@
 // Suba a VERSION toda vez que editar qualquer arquivo, senão o celular
 // continua servindo a versão antiga do cache.
-const VERSION = 'reino-v4.0.0';
+const VERSION = 'reino-v4.1.0';
 
 const ARQUIVOS = [
   './',

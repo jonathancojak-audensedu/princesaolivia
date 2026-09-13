@@ -1,8 +1,9 @@
-import { CORES } from './config.js';
+import { CORES, UNICORNIOS } from './config.js';
 import { estado } from './estado.js';
 import { som, falar } from './audio.js';
 import { ROUPAS, SLOTS, pecaPorId } from './roupas.js';
 import { princesa, miniatura } from './princesa.js';
+import { unicornio, corPorNome } from './unicornio.js';
 import { icone } from './icones.js';
 import { tremer } from './util.js';
 
@@ -12,39 +13,50 @@ import { tremer } from './util.js';
 
 const $ = s => document.querySelector(s);
 
-/** Slot que a paleta pinta: o da última peça vestida. */
+/** Peça que a paleta pinta: a última vestida. */
 let ativa = null;
 
-const primeiroVestido = () => SLOTS.find(s => estado.dados.look[s]) || null;
+const vestida = id => Object.values(estado.dados.look).includes(id);
+const primeiraVestida = () => {
+  const slot = SLOTS.find(s => estado.dados.look[s]);
+  return slot ? estado.dados.look[slot] : null;
+};
 
+/** Abre falando. Use `desenharGuardaRoupa` para voltar sem repetir a fala. */
 export function abrirGuardaRoupa() {
-  ativa = primeiroVestido();
-  desenhar();
+  ativa = primeiraVestida();
+  desenharGuardaRoupa();
   falar(estado.dados.pecas.length
     ? 'Vamos vestir a princesa?'
     : 'Jogue uma fase para ganhar a primeira roupa!');
 }
 
-function botaoPeca(peca, look) {
+function botaoPeca(peca) {
   if (!estado.temPeca(peca.id)) {
     return `<button class="peca travada" data-peca="${peca.id}" aria-label="Roupa ainda não ganha">${icone('cadeado')}</button>`;
   }
-  const item = look[peca.slot];
-  const vestida = Boolean(item && item.id === peca.id);
-  const classes = ['peca', vestida ? 'vestida' : '', vestida && peca.slot === ativa ? 'ativa' : ''].join(' ');
-  return `<button class="${classes}" data-peca="${peca.id}" aria-pressed="${vestida}">${
-    miniatura(peca, vestida ? item.cor : peca.cor)}</button>`;
+  const noCorpo = vestida(peca.id);
+  const classes = ['peca', noCorpo ? 'vestida' : '', noCorpo && peca.id === ativa ? 'ativa' : ''].join(' ');
+  return `<button class="${classes}" data-peca="${peca.id}" aria-pressed="${noCorpo}">${
+    miniatura(peca, estado.corDe(peca.id))}</button>`;
 }
 
-function desenhar() {
-  const { look } = estado.dados;
-  $('#provador-princesa').innerHTML = princesa(look);
+export function desenharGuardaRoupa() {
+  const { look, cores, companhia } = estado.dados;
+  if (ativa && !vestida(ativa)) ativa = primeiraVestida();
+
+  $('#provador-princesa').innerHTML = princesa(look, cores);
+
+  const amigo = UNICORNIOS.find(u => u.id === companhia);
+  $('#btn-estabulo').innerHTML = amigo
+    ? unicornio(corPorNome(amigo.cor), amigo.acessorio)
+    : unicornio(corPorNome('rosa'), '', true);
 
   $('#pecas').innerHTML = SLOTS.map(slot => `<div class="fileira">${
-    ROUPAS.filter(p => p.slot === slot).map(p => botaoPeca(p, look)).join('')
+    ROUPAS.filter(p => p.slot === slot).map(botaoPeca).join('')
   }</div>`).join('');
 
-  const corAtiva = ativa && look[ativa] ? look[ativa].cor : null;
+  const corAtiva = ativa ? estado.corDe(ativa) : null;
   const paleta = $('#paleta');
   paleta.classList.toggle('inativa', !corAtiva);
   paleta.innerHTML = CORES.map(c =>
@@ -59,26 +71,24 @@ $('#pecas').addEventListener('click', e => {
   const peca = pecaPorId(botao.dataset.peca);
   if (!peca || !estado.temPeca(peca.id)) { som.travado(); tremer(botao); return; }
 
-  const item = estado.dados.look[peca.slot];
-  if (item && item.id === peca.id) {
+  if (vestida(peca.id)) {
     estado.tirar(peca.slot);
-    if (ativa === peca.slot) ativa = primeiroVestido();
     som.toque();
   } else {
-    estado.vestir(peca.slot, peca.id, peca.cor);
-    ativa = peca.slot;
+    estado.vestir(peca.id);
+    ativa = peca.id;
     som.virar();
     falar(peca.nome);
   }
-  desenhar();
+  desenharGuardaRoupa();
 });
 
 $('#paleta').addEventListener('click', e => {
   const botao = e.target.closest('.cor');
   if (!botao) return;
-  if (!ativa || !estado.dados.look[ativa]) { som.travado(); tremer($('#paleta')); return; }
+  if (!ativa) { som.travado(); tremer($('#paleta')); return; }
   estado.pintar(ativa, botao.dataset.cor);
   som.toque();
   falar(botao.dataset.cor);
-  desenhar();
+  desenharGuardaRoupa();
 });

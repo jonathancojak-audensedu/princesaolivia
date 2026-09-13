@@ -196,59 +196,104 @@ clique($('#btn-vestir'));
 checar(window.document.querySelectorAll('#pecas .peca.travada').length === 0, 'nenhuma peça deveria estar travada');
 const peca = id => $(`#pecas .peca[data-peca="${id}"]`);
 const cor = nome => $(`#paleta .cor[data-cor="${nome}"]`);
+const naPrincesa = id => $(`#provador-princesa [data-peca="${id}"]`);
 clique(peca('maio'));
-checar($('#provador-princesa [data-peca="maio"]'), 'maiô deveria aparecer na princesa');
-checar(salvo().look.corpo && salvo().look.corpo.id === 'maio' && salvo().look.corpo.cor === 'azul', 'maiô deveria ser salvo com a cor padrão');
-clique(cor('rosa'));
-checar(salvo().look.corpo.cor === 'rosa', 'paleta deveria pintar a peça vestida');
+checar(naPrincesa('maio'), 'maiô deveria aparecer na princesa');
+checar(salvo().look.tronco === 'maio', 'maiô deveria ser salvo no slot tronco');
+clique(peca('coroa'));
+checar(salvo().look.cabeca === 'coroa', 'coroa deveria ir para a cabeça');
+clique(peca('coroa'));
+checar(!salvo().look.cabeca && !naPrincesa('coroa'), 'tocar de novo deveria tirar a peça');
+
+console.log('10. Colete com saia rodada (look de vaquejada)');
+clique(peca('colete'));
+clique(peca('saia-rodada'));
+checar(salvo().look.tronco === 'colete' && salvo().look.pernas === 'saia-rodada', 'colete e saia rodada deveriam ser vestidos juntos');
+checar(naPrincesa('colete') && naPrincesa('saia-rodada'), 'colete e saia rodada deveriam aparecer juntos na princesa');
 clique(peca('vestido-longo'));
-checar(salvo().look.corpo.id === 'vestido-longo', 'peça do mesmo slot deveria substituir a anterior');
-clique(peca('maio'));
+checar(salvo().look.tronco === 'vestido-longo' && !salvo().look.pernas, 'vestido longo deveria tirar colete e saia');
+clique(peca('saia-rodada'));
+checar(salvo().look.pernas === 'saia-rodada' && !salvo().look.tronco, 'saia rodada deveria tirar o vestido longo');
+
+console.log('11. Cor fica guardada por peça');
+clique(peca('vestido-longo'));
 clique(cor('rosa'));
-clique(peca('chapeu-couro'));
-clique(cor('verde'));
-checar($('#provador-princesa [data-peca="maio"]') && $('#provador-princesa [data-peca="chapeu-couro"]'), 'peças de slots diferentes deveriam coexistir');
-clique(peca('coroa'));
-checar(salvo().look.cabeca.id === 'coroa', 'coroa deveria substituir o chapéu');
-clique(peca('coroa'));
-checar(!salvo().look.cabeca, 'tocar de novo deveria tirar a peça');
-checar(!$('#provador-princesa [data-peca="coroa"]'), 'coroa tirada não deveria aparecer');
+checar(salvo().cores['vestido-longo'] === 'rosa', 'cor escolhida deveria ser salva na peça');
+clique(peca('maio'));
+checar(salvo().look.tronco === 'maio', 'maiô deveria substituir o vestido');
+clique(peca('vestido-longo'));
+checar(salvo().look.tronco === 'vestido-longo', 'vestido deveria voltar');
+checar($('#provador-princesa [data-peca="vestido-longo"] path').getAttribute('fill') === '#FF8FB1', 'vestido deveria voltar rosa depois de trocar de roupa');
+clique(peca('vestido-longo'));
+clique(peca('vestido-longo'));
+checar(salvo().cores['vestido-longo'] === 'rosa', 'tirar e vestir de novo deveria manter a cor');
+checar(peca('saia-rodada').querySelector('path').getAttribute('fill') === '#FF8A80', 'peça não pintada deveria mostrar a cor padrão');
 clique(peca('chapeu-couro'));
 clique(cor('verde'));
 
-console.log('10. Persistência do look');
-const esperado = { corpo: { id: 'maio', cor: 'rosa' }, cabeca: { id: 'chapeu-couro', cor: 'verde' } };
+console.log('12. Estábulo: ela escolhe quem vai junto');
+clique($('#btn-estabulo'));
+checar(!$('#tela-estabulo').hidden, 'estábulo deveria abrir pelo guarda-roupa');
+checar(window.document.querySelectorAll('#grade-estabulo .vaga').length === 15, 'estábulo deveria mostrar os 15 unicórnios');
+clique($('#grade-estabulo .vaga[data-unicornio="rubi"]'));
+checar(salvo().companhia === 'rubi', 'escolha do unicórnio deveria ser salva');
+checar($('#grade-estabulo .vaga.escolhida').dataset.unicornio === 'rubi', 'unicórnio escolhido deveria ficar marcado');
+clique($('#voltar-estabulo'));
+checar(!$('#tela-guarda-roupa').hidden, 'voltar do estábulo deveria levar ao guarda-roupa');
+checar($('#btn-estabulo svg[aria-label="unicórnio vermelho"]'), 'botão do estábulo deveria mostrar o unicórnio escolhido');
+
+console.log('13. Persistência do look, das cores e da companhia');
 const { estado: reaberto } = await carregarFresco('js/estado.js');
-checar(JSON.stringify(reaberto.dados.look) === JSON.stringify(esperado),
+checar(JSON.stringify(reaberto.dados.look) === JSON.stringify({ tronco: 'vestido-longo', cabeca: 'chapeu-couro' }),
   'look deveria sobreviver a reabrir o app, veio: ' + JSON.stringify(reaberto.dados.look));
+checar(reaberto.dados.cores['vestido-longo'] === 'rosa' && reaberto.dados.cores['chapeu-couro'] === 'verde',
+  'cores deveriam sobreviver a reabrir o app');
+checar(reaberto.dados.companhia === 'rubi', 'companhia deveria sobreviver a reabrir o app');
 checar(reaberto.dados.fasesConcluidas.length === 15, 'localStorage deveria ter 15 fases');
-checar(reaberto.dados.versao === 2, 'estado salvo deveria estar na versão 2');
+checar(reaberto.dados.versao === 3, 'estado salvo deveria estar na versão 3');
 clique($('#voltar-guarda-roupa'));
-clique($('#lista-ocasioes').children[2]);
-checar($('#ocasiao-cena [data-peca="maio"]') && $('#ocasiao-cena [data-peca="chapeu-couro"]'), 'ocasião revisitada deveria mostrar o look escolhido');
+clique($('#lista-ocasioes').children[0]);
+checar($('#ocasiao-cena [data-peca="vestido-longo"]') && $('#ocasiao-cena [data-peca="chapeu-couro"]'), 'ocasião revisitada deveria mostrar o look escolhido');
+checar($('#ocasiao-cena svg svg[aria-label="unicórnio vermelho"]'), 'a Praia deveria levar o unicórnio escolhido, não o padrão');
 clique($('#voltar-ocasiao'));
 
-console.log('11. Zerar');
+console.log('14. Zerar');
 clique($('#btn-zerar'));
 checar($('#contador-colecao').textContent === '0 / 15', 'depois de zerar deveria voltar a 0/15');
-checar(Object.keys(salvo().look).length === 0 && salvo().pecas.length === 0, 'zerar deveria limpar peças e look');
+checar(Object.keys(salvo().look).length === 0 && salvo().pecas.length === 0 && Object.keys(salvo().cores).length === 0,
+  'zerar deveria limpar peças, look e cores');
+checar(salvo().companhia === null, 'zerar deveria desfazer a escolha do unicórnio');
 checar($('#lista-ocasioes').hidden, 'zerar deveria esconder as ocasiões');
 
-console.log('12. Migração de estado v1 para v2');
+console.log('15. Migração de estado v1 para v3');
 ram = { 'reino-encantado': JSON.stringify({
   versao: 1, fasesConcluidas: ['1-1', '1-2', '1-3'], unicornios: ['luna', 'ceu', 'mel'], douradas: 2, prateadas: 1
 }) };
 const { estado: migrado } = await carregarFresco('js/estado.js');
 const d = migrado.dados;
-checar(d.versao === 2, 'estado v1 deveria virar v2');
+checar(d.versao === 3, 'estado v1 deveria virar v3');
 checar(JSON.stringify(d.unicornios) === '["luna","ceu","mel"]', 'unicórnios da v1 deveriam ser mantidos, veio: ' + JSON.stringify(d.unicornios));
 checar(JSON.stringify(d.fasesConcluidas) === '["1-1","1-2","1-3"]', 'fases da v1 deveriam ser mantidas');
 checar(d.douradas === 2 && d.prateadas === 1, 'estrelas da v1 deveriam ser mantidas');
 checar(JSON.stringify(d.pecas) === '["maio","chapeu-palha","oculos"]', 'fases já feitas deveriam entregar suas peças, veio: ' + JSON.stringify(d.pecas));
-checar(JSON.stringify(d.look) === '{}', 'look deveria começar vazio');
-migrado.vestir('rosto', 'oculos', 'roxo');
-checar(salvo().versao === 2 && salvo().unicornios.length === 3 && salvo().look.rosto.id === 'oculos',
-  'primeira gravação depois da migração deveria salvar v2 sem perder os unicórnios');
+checar(JSON.stringify(d.look) === '{}' && JSON.stringify(d.cores) === '{}' && d.companhia === null, 'look, cores e companhia deveriam começar vazios');
+migrado.vestir('oculos');
+checar(salvo().versao === 3 && salvo().unicornios.length === 3 && salvo().look.rosto === 'oculos',
+  'primeira gravação depois da migração deveria salvar v3 sem perder os unicórnios');
+
+console.log('16. Migração de estado v2 para v3');
+ram = { 'reino-encantado': JSON.stringify({
+  versao: 2, fasesConcluidas: ['1-1'], unicornios: ['luna'], douradas: 1, prateadas: 0,
+  pecas: ['maio', 'vestido-longo', 'saia-rodada', 'coroa'],
+  look: { corpo: { id: 'vestido-longo', cor: 'rosa' }, cabeca: { id: 'coroa', cor: 'verde' } }
+}) };
+const { estado: v2 } = await carregarFresco('js/estado.js');
+checar(v2.dados.versao === 3, 'estado v2 deveria virar v3');
+checar(JSON.stringify(v2.dados.look) === JSON.stringify({ tronco: 'vestido-longo', cabeca: 'coroa' }),
+  'look da v2 deveria ir para os slots novos, veio: ' + JSON.stringify(v2.dados.look));
+checar(v2.dados.cores['vestido-longo'] === 'rosa' && v2.dados.cores.coroa === 'verde', 'vestido rosa da v2 não pode perder a cor');
+checar(JSON.stringify(v2.dados.pecas) === '["maio","vestido-longo","saia-rodada","coroa"]' && v2.dados.unicornios[0] === 'luna',
+  'peças e unicórnios da v2 deveriam ser mantidos');
 
 console.log(erros === 0 ? '\n✅ TODOS OS TESTES PASSARAM' : `\n❌ ${erros} FALHA(S)`);
 process.exit(erros ? 1 : 0);

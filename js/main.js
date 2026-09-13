@@ -7,7 +7,7 @@ import { unicornio, corPorNome } from './unicornio.js';
 import { icone } from './icones.js';
 import { ROUPAS, pecaPorId } from './roupas.js';
 import { princesa, miniatura } from './princesa.js';
-import { abrirGuardaRoupa } from './guarda-roupa.js';
+import { abrirGuardaRoupa, desenharGuardaRoupa } from './guarda-roupa.js';
 import { sorteio, tremer } from './util.js';
 import { rodada as rodadaCores } from './jogos/cores.js';
 import { rodada as rodadaContar } from './jogos/contar.js';
@@ -24,6 +24,7 @@ const telas = {
   jogo:     $('#tela-jogo'),
   premio:   $('#tela-premio'),
   guardaRoupa: $('#tela-guarda-roupa'),
+  estabulo: $('#tela-estabulo'),
   ocasiao:  $('#tela-ocasiao')
 };
 
@@ -267,17 +268,48 @@ function telaGuardaRoupa(voltar) {
   mostrar('guardaRoupa');
 }
 
+/* ---------------- estábulo ---------------- */
+// Os 15 unicórnios ficam todos disponíveis: ela escolhe quem vai junto nas ocasiões.
+// Tocar no escolhido de novo desfaz a escolha e cada ocasião volta ao seu padrão.
+function telaEstabulo() {
+  const { companhia } = estado.dados;
+  $('#grade-estabulo').innerHTML = UNICORNIOS.map(u => {
+    const escolhido = u.id === companhia;
+    return `<button class="vaga ${escolhido ? 'escolhida' : ''}" data-unicornio="${u.id}" aria-pressed="${escolhido}">
+      ${unicornio(corPorNome(u.cor), u.acessorio)}
+      <span>${u.nome}</span>
+    </button>`;
+  }).join('');
+  mostrar('estabulo');
+}
+
+$('#grade-estabulo').addEventListener('click', e => {
+  const vaga = e.target.closest('.vaga');
+  if (!vaga) return;
+  const id = vaga.dataset.unicornio;
+  if (estado.dados.companhia === id) {
+    estado.escolherCompanhia(null);
+    som.toque();
+  } else {
+    estado.escolherCompanhia(id);
+    som.acerto();
+    falar(`${UNICORNIOS.find(u => u.id === id).nome} vai junto!`);
+  }
+  telaEstabulo();
+});
+
 /* ---------------- ocasião ---------------- */
 let ocasiaoAtual = 1;
 
 function telaOcasiao(idMundo) {
   const mundo = MUNDOS.find(m => m.id === idMundo);
-  const amigo = UNICORNIOS.find(u => u.id === mundo.ocasiao.unicornio) || UNICORNIOS[0];
+  const escolha = estado.dados.companhia || mundo.ocasiao.unicornio;
+  const amigo = UNICORNIOS.find(u => u.id === escolha) || UNICORNIOS[0];
   ocasiaoAtual = idMundo;
   pintarCeu(mundo);
   $('#nome-ocasiao').textContent = mundo.ocasiao.nome;
   $('#ocasiao-cena').innerHTML = palcoOcasiao(idMundo,
-    princesa(estado.dados.look), unicornio(corPorNome(amigo.cor), amigo.acessorio));
+    princesa(estado.dados.look, estado.dados.cores), unicornio(corPorNome(amigo.cor), amigo.acessorio));
   mostrar('ocasiao');
   festa(1.2);
   som.festa();
@@ -291,6 +323,8 @@ $('#btn-vestir em').innerHTML = miniatura(pecaPorId('vestido-longo'), 'rosa');
 $('#btn-vestir').addEventListener('click', () => { desbloquear(); som.toque(); telaGuardaRoupa(telaMundos); });
 $('#voltar-fases').addEventListener('click', () => { som.toque(); telaMundos(); });
 $('#voltar-guarda-roupa').addEventListener('click', () => { som.toque(); voltarDoGuardaRoupa(); });
+$('#btn-estabulo').addEventListener('click', () => { som.toque(); telaEstabulo(); });
+$('#voltar-estabulo').addEventListener('click', () => { som.toque(); desenharGuardaRoupa(); mostrar('guardaRoupa'); });
 $('#voltar-ocasiao').addEventListener('click', () => { som.toque(); telaMundos(); });
 $('#ocasiao-vestir').addEventListener('click', () => { som.toque(); telaGuardaRoupa(() => telaOcasiao(ocasiaoAtual)); });
 $('#sair-jogo').addEventListener('click', () => { limparTimers(); calar(); som.toque(); telaFases(partida.mundo.id); });

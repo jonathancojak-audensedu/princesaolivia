@@ -1,8 +1,8 @@
 import { MUNDOS, FASES } from './config.js';
-import { ROUPAS } from './roupas.js';
+import { ROUPAS, pecaPorId, slotsDe } from './roupas.js';
 
 const CHAVE = 'reino-encantado';
-const VERSAO = 2;
+const VERSAO = 3;
 
 /** Sempre um objeto novo: espalhar um PADRAO fixo compartilharia os arrays entre cargas. */
 const novo = () => ({
@@ -10,24 +10,45 @@ const novo = () => ({
   fasesConcluidas: [],   // ['1-1', '1-2', ...]
   unicornios: [],        // coleção da versão 1, preservada na migração
   pecas: [],             // ids de roupas.js já ganhos
-  look: {},              // { slot: { id, cor } }
+  look: {},              // { slot: idDaPeca }
+  cores: {},             // { idDaPeca: nomeDaCor }, por peça: tirar e vestir de novo mantém a cor
+  companhia: null,       // id do unicórnio que ela escolheu; null usa o padrão de cada ocasião
   douradas: 0,
   prateadas: 0
 });
 
 const indice = (mundo, fase) => (mundo - 1) * FASES.length + (fase - 1);
 
-/** v1 para v2: nada se perde. Unicórnios ficam, e cada fase já fechada entrega a sua peça. */
+/**
+ * Nada se perde em nenhuma migração.
+ * v1 para v2: unicórnios ficam, e cada fase já fechada entrega a sua peça.
+ * v2 para v3: look `{ corpo: { id, cor } }` vira `{ tronco: id }` + `cores: { id: cor }`,
+ *             cada peça no slot que ela tem hoje no catálogo.
+ */
 function migrar(salvo) {
   const dados = { ...novo(), ...salvo };
-  if ((salvo.versao || 1) < 2) {
+  const versao = salvo.versao || 1;
+
+  if (versao < 2) {
     dados.pecas = dados.fasesConcluidas
       .map(chave => ROUPAS[indice(...chave.split('-').map(Number))])
       .filter(Boolean)
       .map(p => p.id);
     dados.look = {};
-    dados.versao = VERSAO;
   }
+
+  if (versao === 2) {
+    dados.look = {};
+    dados.cores = {};
+    Object.values(salvo.look || {}).forEach(item => {
+      const peca = item && pecaPorId(item.id);
+      if (!peca) return;
+      dados.look[peca.slot] = peca.id;
+      if (item.cor) dados.cores[peca.id] = item.cor;
+    });
+  }
+
+  dados.versao = VERSAO;
   return dados;
 }
 
@@ -101,8 +122,16 @@ export const estado = {
 
   temPeca(id) { return dados.pecas.includes(id); },
 
-  vestir(slot, id, cor) {
-    dados.look[slot] = { id, cor };
+  /** Veste no slot da peça, tirando antes o que dividir espaço com ela (vestido tira a saia). */
+  vestir(id) {
+    const peca = pecaPorId(id);
+    if (!peca) return;
+    const ocupa = slotsDe(peca);
+    Object.entries(dados.look).forEach(([slot, outra]) => {
+      const vestida = pecaPorId(outra);
+      if (vestida && slotsDe(vestida).some(s => ocupa.includes(s))) delete dados.look[slot];
+    });
+    dados.look[peca.slot] = id;
     salvar();
   },
 
@@ -111,9 +140,19 @@ export const estado = {
     salvar();
   },
 
-  pintar(slot, cor) {
-    if (!dados.look[slot]) return;
-    dados.look[slot].cor = cor;
+  /** A cor pertence à peça, vestida ou não. */
+  pintar(id, cor) {
+    dados.cores[id] = cor;
+    salvar();
+  },
+
+  corDe(id) {
+    const peca = pecaPorId(id);
+    return dados.cores[id] || (peca && peca.cor);
+  },
+
+  escolherCompanhia(id) {
+    dados.companhia = id;
     salvar();
   },
 

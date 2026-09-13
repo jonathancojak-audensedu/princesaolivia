@@ -7,13 +7,14 @@
 // `cor` é um objeto de CORES: `pelo` é o tom principal, `crina` o detalhe.
 // `vista` é o viewBox da miniatura, nas mesmas coordenadas locais.
 // `semBase` tira o vestidinho creme de baixo (peças que já cobrem o tronco).
+// `inteira` ocupa tronco E pernas: vestir um vestido tira a saia, e vice-versa.
 
-export const SLOTS = ['cabeca', 'rosto', 'corpo', 'pes', 'mao'];
+export const SLOTS = ['cabeca', 'rosto', 'tronco', 'pernas', 'pes', 'mao'];
 
 export const ROUPAS = [
   /* ---------- mundo 1: Praia ---------- */
   {
-    id: 'maio', nome: 'Maiô', artigo: 'um', slot: 'corpo', mundo: 1, cor: 'azul', semBase: true,
+    id: 'maio', nome: 'Maiô', artigo: 'um', slot: 'tronco', mundo: 1, cor: 'azul', semBase: true,
     vista: '-30 -2 60 122',
     desenho: c => `
       <path d="M-20 6Q0 16 20 6L21 104Q0 116 -21 104z" fill="${c.pelo}"/>
@@ -70,7 +71,7 @@ export const ROUPAS = [
       <path d="M-66 -6Q-58 14 0 12Q58 14 66 -6Q44 6 0 4Q-44 6 -66 -6z" fill="${c.crina}"/>`
   },
   {
-    id: 'colete', nome: 'Colete', artigo: 'um', slot: 'corpo', mundo: 2, cor: 'verde',
+    id: 'colete', nome: 'Colete', artigo: 'um', slot: 'tronco', mundo: 2, cor: 'verde',
     vista: '-36 2 72 78',
     desenho: c => `
       <path d="M-22 8L-5 12L-9 74L-31 72zM22 8L5 12L9 74L31 72z" fill="${c.pelo}"/>
@@ -79,12 +80,12 @@ export const ROUPAS = [
       <circle cx="-13" cy="52" r="3" fill="${c.crina}"/>`
   },
   {
-    id: 'saia-rodada', nome: 'Saia rodada', artigo: 'uma', slot: 'corpo', mundo: 2, cor: 'vermelho',
-    vista: '-62 56 124 104',
+    id: 'saia-rodada', nome: 'Saia rodada', artigo: 'uma', slot: 'pernas', mundo: 2, cor: 'vermelho',
+    vista: '-62 -14 124 104',
     desenho: c => `
-      <path d="M-26 68H26L58 140Q0 158 -58 140z" fill="${c.pelo}"/>
-      <path d="M-58 140Q0 158 58 140" stroke="${c.crina}" stroke-width="7" fill="none" stroke-linecap="round"/>
-      <rect x="-27" y="62" width="54" height="10" rx="4" fill="${c.crina}"/>`
+      <path d="M-26 -2H26L58 70Q0 88 -58 70z" fill="${c.pelo}"/>
+      <path d="M-58 70Q0 88 58 70" stroke="${c.crina}" stroke-width="7" fill="none" stroke-linecap="round"/>
+      <rect x="-27" y="-8" width="54" height="10" rx="4" fill="${c.crina}"/>`
   },
   {
     id: 'laco', nome: 'Laço', artigo: 'um', slot: 'cabeca', mundo: 2, cor: 'rosa',
@@ -96,7 +97,7 @@ export const ROUPAS = [
 
   /* ---------- mundo 3: Baile ---------- */
   {
-    id: 'vestido-longo', nome: 'Vestido longo', artigo: 'um', slot: 'corpo', mundo: 3, cor: 'roxo', semBase: true,
+    id: 'vestido-longo', nome: 'Vestido longo', artigo: 'um', slot: 'tronco', inteira: true, mundo: 3, cor: 'roxo', semBase: true,
     vista: '-66 -2 132 190',
     desenho: c => `
       <path d="M-20 4Q0 14 20 4L18 70H-18z" fill="${c.pelo}"/>
@@ -142,3 +143,6 @@ export const ROUPAS = [
 ];
 
 export const pecaPorId = id => ROUPAS.find(p => p.id === id) || null;
+
+/** Slots que a peça ocupa no corpo. Duas peças que dividem algum slot não vão juntas. */
+export const slotsDe = peca => peca.inteira ? ['tronco', 'pernas'] : [peca.slot];
