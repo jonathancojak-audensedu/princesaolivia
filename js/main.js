@@ -2,9 +2,12 @@ import { MUNDOS, FASES, UNICORNIOS, ELOGIOS, MODO_PERDER, VIDAS } from './config
 import { estado } from './estado.js';
 import { som, falar, repetirFala, calar, desbloquear } from './audio.js';
 import { festa, faisca } from './festa.js';
-import { cenario } from './cenario.js';
+import { cenario, palcoOcasiao } from './cenario.js';
 import { unicornio, corPorNome } from './unicornio.js';
 import { icone } from './icones.js';
+import { ROUPAS, pecaPorId } from './roupas.js';
+import { princesa, miniatura } from './princesa.js';
+import { abrirGuardaRoupa } from './guarda-roupa.js';
 import { sorteio, tremer } from './util.js';
 import { rodada as rodadaCores } from './jogos/cores.js';
 import { rodada as rodadaContar } from './jogos/contar.js';
@@ -20,7 +23,8 @@ const telas = {
   fases:    $('#tela-fases'),
   jogo:     $('#tela-jogo'),
   premio:   $('#tela-premio'),
-  estabulo: $('#tela-estabulo')
+  guardaRoupa: $('#tela-guarda-roupa'),
+  ocasiao:  $('#tela-ocasiao')
 };
 
 function mostrar(nome) {
@@ -58,7 +62,18 @@ function telaMundos() {
     });
   });
 
-  $('#contador-colecao').textContent = `${estado.dados.unicornios.length} / ${UNICORNIOS.length}`;
+  $('#contador-colecao').textContent = `${estado.dados.pecas.length} / ${ROUPAS.length}`;
+
+  const abertas = MUNDOS.filter(m => estado.mundoCompleto(m.id));
+  const ocasioes = $('#lista-ocasioes');
+  ocasioes.hidden = !abertas.length;
+  ocasioes.innerHTML = abertas.map(m => `<button class="cartao-ocasiao" data-mundo="${m.id}">
+      <em>${miniatura(pecaPorId(m.ocasiao.simbolo))}</em><span>${m.ocasiao.nome}</span>
+    </button>`).join('');
+  ocasioes.querySelectorAll('.cartao-ocasiao').forEach(b => {
+    b.addEventListener('click', () => { desbloquear(); som.toque(); telaOcasiao(Number(b.dataset.mundo)); });
+  });
+
   mostrar('mundos');
 }
 
@@ -92,7 +107,8 @@ function telaFases(idMundo) {
 /* ---------------- partida ---------------- */
 const partida = {
   mundo: null, fase: null, roteiro: [], indice: 0,
-  dourada: true, vidas: VIDAS, timers: [], raf: null, fimTempo: 0, pausado: false
+  dourada: true, vidas: VIDAS, timers: [], raf: null, fimTempo: 0, pausado: false,
+  abrirOcasiao: false   // true quando esta fase fechou o mundo pela primeira vez
 };
 
 function limparTimers() {
@@ -134,7 +150,7 @@ function iniciarFase(idMundo, numFase) {
   Object.assign(partida, {
     mundo, fase: numFase,
     roteiro: FASES[numFase - 1].rodadas,
-    indice: 0, dourada: true, vidas: VIDAS
+    indice: 0, dourada: true, vidas: VIDAS, abrirOcasiao: false
   });
   pintarCeu(mundo);
   $('#titulo-fase').innerHTML = `<em class="na-linha">${icone(mundo.icone)}</em>Fase ${numFase} · ${FASES[numFase - 1].nome}`;
@@ -215,24 +231,25 @@ function acabouTempo() {
 /* ---------------- fim de fase ---------------- */
 function fimDeFase() {
   limparTimers();
-  const jaTinha = estado.concluida(partida.mundo.id, partida.fase);
-  estado.concluir(partida.mundo.id, partida.fase, partida.dourada);
+  const idMundo = partida.mundo.id;
+  const jaTinha = estado.concluida(idMundo, partida.fase);
+  const mundoJaFechado = estado.mundoCompleto(idMundo);
+  estado.concluir(idMundo, partida.fase, partida.dourada);
+  partida.abrirOcasiao = !mundoJaFechado && estado.mundoCompleto(idMundo);
 
-  const indice = estado.indiceGlobal(partida.mundo.id, partida.fase);
-  const premio = UNICORNIOS[indice % UNICORNIOS.length];
-  const novo = estado.ganharUnicornio(premio.id);
+  const peca = ROUPAS[estado.indiceGlobal(idMundo, partida.fase) % ROUPAS.length];
+  const nova = estado.ganharPeca(peca.id);
 
   festa(partida.dourada ? 1.6 : 1);
   som.premio();
 
-  if (novo) {
-    $('#premio-titulo').textContent = 'Um amigo novo!';
-    $('#premio-desenho').innerHTML = unicornio(corPorNome(premio.cor), premio.acessorio);
-    $('#premio-nome').textContent = premio.nome;
-    falar(`Você ganhou ${premio.nome}!`);
+  $('#premio-desenho').innerHTML = miniatura(peca);
+  if (nova) {
+    $('#premio-titulo').textContent = 'Uma roupa nova!';
+    $('#premio-nome').textContent = peca.nome;
+    falar(`Você ganhou ${peca.artigo} ${peca.nome.toLowerCase()}!`);
   } else {
     $('#premio-titulo').textContent = jaTinha ? 'Muito bem de novo!' : 'Fase completa!';
-    $('#premio-desenho').innerHTML = unicornio(corPorNome(premio.cor), premio.acessorio);
     $('#premio-nome').innerHTML = `<em class="na-linha">${icone('estrela')}</em>${partida.dourada ? 'Estrela dourada' : 'Fase completa'}`;
   }
 
@@ -240,29 +257,49 @@ function fimDeFase() {
   mostrar('premio');
 }
 
-/* ---------------- estábulo ---------------- */
-function telaEstabulo() {
-  pintarCeu(null);
-  $('#grade-estabulo').innerHTML = UNICORNIOS.map(u => {
-    const tem = estado.tem(u.id);
-    return `<figure class="vaga ${tem ? '' : 'vazia'}">
-      ${unicornio(corPorNome(u.cor), u.acessorio, !tem)}
-      <figcaption>${tem ? u.nome : '???'}</figcaption>
-    </figure>`;
-  }).join('');
-  mostrar('estabulo');
+/* ---------------- guarda-roupa ---------------- */
+/** Para onde o voltar do guarda-roupa leva: menu, ou a ocasião de onde ela veio. */
+let voltarDoGuardaRoupa = telaMundos;
+
+function telaGuardaRoupa(voltar) {
+  voltarDoGuardaRoupa = voltar;
+  abrirGuardaRoupa();
+  mostrar('guardaRoupa');
+}
+
+/* ---------------- ocasião ---------------- */
+let ocasiaoAtual = 1;
+
+function telaOcasiao(idMundo) {
+  const mundo = MUNDOS.find(m => m.id === idMundo);
+  const amigo = UNICORNIOS.find(u => u.id === mundo.ocasiao.unicornio) || UNICORNIOS[0];
+  ocasiaoAtual = idMundo;
+  pintarCeu(mundo);
+  $('#nome-ocasiao').textContent = mundo.ocasiao.nome;
+  $('#ocasiao-cena').innerHTML = palcoOcasiao(idMundo,
+    princesa(estado.dados.look), unicornio(corPorNome(amigo.cor), amigo.acessorio));
+  mostrar('ocasiao');
+  festa(1.2);
+  som.festa();
+  falar(mundo.ocasiao.fala);
 }
 
 /* ---------------- ligações ---------------- */
 document.querySelectorAll('[data-icone]').forEach(el => el.innerHTML = icone(el.dataset.icone));
-$('#btn-estabulo em').innerHTML = unicornio(corPorNome('rosa'));
+$('#btn-vestir em').innerHTML = miniatura(pecaPorId('vestido-longo'), 'rosa');
 
-$('#btn-estabulo').addEventListener('click', () => { desbloquear(); som.toque(); telaEstabulo(); });
+$('#btn-vestir').addEventListener('click', () => { desbloquear(); som.toque(); telaGuardaRoupa(telaMundos); });
 $('#voltar-fases').addEventListener('click', () => { som.toque(); telaMundos(); });
-$('#voltar-estabulo').addEventListener('click', () => { som.toque(); telaMundos(); });
+$('#voltar-guarda-roupa').addEventListener('click', () => { som.toque(); voltarDoGuardaRoupa(); });
+$('#voltar-ocasiao').addEventListener('click', () => { som.toque(); telaMundos(); });
+$('#ocasiao-vestir').addEventListener('click', () => { som.toque(); telaGuardaRoupa(() => telaOcasiao(ocasiaoAtual)); });
 $('#sair-jogo').addEventListener('click', () => { limparTimers(); calar(); som.toque(); telaFases(partida.mundo.id); });
 $('#repetir').addEventListener('click', repetirFala);
-$('#premio-continuar').addEventListener('click', () => { som.toque(); telaFases(partida.mundo.id); });
+$('#premio-continuar').addEventListener('click', () => {
+  som.toque();
+  if (partida.abrirOcasiao) telaOcasiao(partida.mundo.id);
+  else telaFases(partida.mundo.id);
+});
 
 $('#btn-zerar').addEventListener('click', () => {
   if (confirm('Apagar todo o progresso e a coleção?')) { estado.zerar(); telaMundos(); }

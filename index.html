@@ -25,8 +25,9 @@
   <section id="tela-mundos" class="tela">
     <h1 id="titulo"><b>Reino Encantado</b><i>escolha um lugar</i></h1>
     <div id="lista-mundos"></div>
-    <button id="btn-estabulo" class="barra-baixo">
-      <em aria-hidden="true"></em><span>Meus unicórnios</span><small id="contador-colecao"></small>
+    <div id="lista-ocasioes" hidden></div>
+    <button id="btn-vestir" class="barra-baixo">
+      <em aria-hidden="true"></em><span>Vestir</span><small id="contador-colecao"></small>
     </button>
   </section>
 
@@ -65,15 +66,30 @@
     <button id="premio-continuar" class="botao-grande">Continuar</button>
   </section>
 
-  <!-- ============ ESTÁBULO ============ -->
-  <section id="tela-estabulo" class="tela" hidden>
+  <!-- ============ GUARDA-ROUPA ============ -->
+  <section id="tela-guarda-roupa" class="tela" hidden>
     <header class="topo">
-      <button id="voltar-estabulo" class="circ" aria-label="Voltar" data-icone="seta"></button>
-      <h2>Meus unicórnios</h2>
+      <button id="voltar-guarda-roupa" class="circ" aria-label="Voltar" data-icone="seta"></button>
+      <h2>Vestir</h2>
       <span class="circ vazio" aria-hidden="true"></span>
     </header>
-    <div id="grade-estabulo"></div>
+    <div id="provador">
+      <div id="provador-princesa"></div>
+      <div id="paleta" aria-label="Cores"></div>
+    </div>
+    <div id="pecas"></div>
     <button id="btn-zerar" class="link-discreto">Começar tudo de novo</button>
+  </section>
+
+  <!-- ============ OCASIÃO ============ -->
+  <section id="tela-ocasiao" class="tela" hidden>
+    <header class="topo">
+      <button id="voltar-ocasiao" class="circ" aria-label="Voltar" data-icone="seta"></button>
+      <h2 id="nome-ocasiao"></h2>
+      <span class="circ vazio" aria-hidden="true"></span>
+    </header>
+    <div id="ocasiao-cena"></div>
+    <button id="ocasiao-vestir" class="botao-grande">Trocar de roupa</button>
   </section>
 
 </main>

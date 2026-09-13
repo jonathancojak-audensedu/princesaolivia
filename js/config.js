@@ -18,8 +18,9 @@ export const CORES = [
   { nome: 'branco',   pelo: '#F4EEF9', crina: '#B0A2C4' }
 ];
 
-/** Recompensa de cada fase: um unicórnio novo para o estábulo.
- *  A ordem importa — é a ordem em que ela vai colecionar.
+/** Unicórnios. Não são mais prêmio de fase (a fase entrega roupa, ver roupas.js):
+ *  aparecem como companhia na cena de cada ocasião. A lista inteira fica porque
+ *  quem jogou a versão 1 tem esses ids salvos.
  *  `acessorio` é o nome de um ícone de js/icones.js. */
 export const UNICORNIOS = [
   { id: 'luna',     nome: 'Luna',     cor: 'rosa',     acessorio: 'lua' },
@@ -39,12 +40,14 @@ export const UNICORNIOS = [
   { id: 'rubi',     nome: 'Rubi',     cor: 'vermelho', acessorio: 'coroa' }
 ];
 
-/** 3 mundos x 5 fases. `nivel` é o que cada minijogo lê para se ajustar. */
+/** 3 mundos x 5 fases. `nivel` é o que cada minijogo lê para se ajustar.
+ *  `ocasiao` abre quando o mundo fecha 5/5. Só sugere um passeio: não exige roupa nenhuma. */
 export const MUNDOS = [
   {
     id: 1,
     nome: 'Castelo',
     icone: 'castelo',
+    ocasiao: { nome: 'Praia', fala: 'Dia de praia!', unicornio: 'onda', simbolo: 'chapeu-palha' },
     ceu: ['#5B3E8C', '#2E2350'],
     nivel: { opcoes: 3, maxNumero: 3, pares: 2, coresParecidas: false, segundos: 14 }
   },
@@ -52,6 +55,7 @@ export const MUNDOS = [
     id: 2,
     nome: 'Floresta',
     icone: 'arvore',
+    ocasiao: { nome: 'Vaquejada', fala: 'Vamos para a vaquejada!', unicornio: 'mel', simbolo: 'chapeu-couro' },
     ceu: ['#2F6B52', '#15342A'],
     nivel: { opcoes: 4, maxNumero: 5, pares: 3, coresParecidas: false, segundos: 12 }
   },
@@ -59,6 +63,7 @@ export const MUNDOS = [
     id: 3,
     nome: 'Nuvens',
     icone: 'nuvem',
+    ocasiao: { nome: 'Baile', fala: 'Hora do baile!', unicornio: 'luna', simbolo: 'coroa' },
     ceu: ['#3E63A8', '#1B2A52'],
     nivel: { opcoes: 5, maxNumero: 10, pares: 4, coresParecidas: true, segundos: 10 }
   }
